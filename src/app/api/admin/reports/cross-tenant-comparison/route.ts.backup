@@ -1,0 +1,83 @@
+﻿/**
+ * GET /api/admin/reports/cross-tenant-comparison
+ *
+ * Cross-tenant comparison report with per-LGU metrics (Req 10.6).
+ * Shows enrollment rate, completion rate, and inventory utilization
+ * for each tenant side-by-side. Restricted to Super Admin only.
+ * Cached for 1 hour (Req 10.7). Supports PDF/CSV export (Req 10.8).
+ *
+ * Requirements: 3.3, 3.4, 3.5, 3.6, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { getCrossTenantComparison } from '@/services/reportingService';
+import {
+  buildSimplePdf,
+  createPdfDownloadResponse,
+  objectsToCsv,
+  createCsvDownloadResponse,
+} from '@/utils/export';
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { userId, isSuperAdmin } = ctxResult.context;
+
+  // Strictly Super Admin only (Req 10.1)
+  if (!isSuperAdmin) {
+    return forbiddenResponse('Cross-tenant comparison reports are restricted to Super Admin');
+  }
+
+  const { searchParams } = new URL(request.url);
+  const startDate = searchParams.get('start_date') || searchParams.get('startDate') || undefined;
+  const endDate = searchParams.get('end_date') || searchParams.get('endDate') || undefined;
+  const format = searchParams.get('format') || 'json';
+
+  const report = await getCrossTenantComparison(userId, { startDate, endDate });
+
+  // PDF export (Req 10.8)
+  if (format === 'pdf') {
+    const lines = [
+      `Generated: ${report.generatedAt}`,
+      '',
+      'Tenant | Programs | Enrollments | Completions | Enroll% | Complete% | Inventory%',
+      ...report.tenants.map(
+        (t) =>
+          `${t.tenantName} | ${t.programs} | ${t.enrollments} | ${t.completions} | ${t.enrollmentRate}% | ${t.completionRate}% | ${t.inventoryUtilization}%`
+      ),
+    ];
+    const pdf = buildSimplePdf('Cross-Tenant Comparison Report', lines);
+    return createPdfDownloadResponse(pdf, `cross-tenant-comparison-${Date.now()}.pdf`);
+  }
+
+  // CSV export (Req 10.8)
+  if (format === 'csv') {
+    const rows = report.tenants.map((t) => ({
+      tenant_id: t.tenantId,
+      tenant_name: t.tenantName,
+      status: t.status,
+      programs: t.programs,
+      enrollments: t.enrollments,
+      completions: t.completions,
+      trainees: t.trainees,
+      items: t.items,
+      certificates: t.certificates,
+      enrollment_rate_pct: t.enrollmentRate,
+      completion_rate_pct: t.completionRate,
+      inventory_utilization_pct: t.inventoryUtilization,
+    }));
+    const csv = objectsToCsv(rows);
+    return createCsvDownloadResponse(csv, `cross-tenant-comparison-${Date.now()}.csv`);
+  }
+
+  return successResponse(report);
+});

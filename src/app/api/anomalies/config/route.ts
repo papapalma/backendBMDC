@@ -1,0 +1,49 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { anomalyService } from '@/services/anomalyService';
+import { activityLogService } from '@/services/activityLogService';
+import { requireAuthAsync, requireRoleAsync } from '@/middleware/auth';
+import { updateDetectionConfigSchema } from '@/utils/validators';
+import { successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/anomalies/config - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/anomalies/config - Get anomaly detection configuration
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const config = await anomalyService.getDetectionConfig(authResult.user.tenantId);
+  return successResponse(config);
+});
+
+// PUT /api/anomalies/config - Update anomaly detection configuration
+
+export const PUT = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['local_admin', 'staff_inventory_manager', 'staff_training_coordinator']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const body = await request.json();
+  const validatedData = updateDetectionConfigSchema.parse(body);
+
+  const updated = await anomalyService.updateDetectionConfig(validatedData, authResult.user.email, authResult.user.tenantId);
+
+  await activityLogService.logAction(
+    authResult.user.userId,
+    'update_detection_config',
+    'anomaly',
+    updated.id,
+    {
+      config_key: updated.config_key,
+      updated_by: authResult.user.email,
+    }
+  );
+
+  return successResponse(updated, 'Detection configuration updated successfully');
+});

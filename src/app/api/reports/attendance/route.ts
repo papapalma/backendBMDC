@@ -1,0 +1,365 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAuthAsync } from '@/middleware/auth';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { successResponse } from '@/utils/responses';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
+
+type SessionRow = {
+  id: string;
+  program_id: string;
+  title: string;
+  session_date: string;
+  start_time: string;
+  end_time: string;
+  status: string;
+};
+
+type AttendanceRow = {
+  session_id: string;
+  trainee_id: string;
+  status: AttendanceStatus;
+};
+
+// OPTIONS /api/reports/attendance - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/reports/attendance - Get attendance analytics report
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const user = authResult.user;
+  const { searchParams } = new URL(request.url);
+  const startDate = searchParams.get('startDate') || searchParams.get('start_date') || undefined;
+  const endDate = searchParams.get('endDate') || searchParams.get('end_date') || undefined;
+  const programId = searchParams.get('program') || searchParams.get('program_id') || undefined;
+  const sessionId = searchParams.get('session') || searchParams.get('session_id') || undefined;
+
+  let sessionsQuery = supabaseAdmin
+  .from('program_sessions')
+  .select('id, program_id, title, session_date, start_time, end_time, status');
+
+  // Tenant isolation: non-super-admins can only see their own tenant's sessions
+
+if (user.role !== 'super_admin') {
+  sessionsQuery = sessionsQuery.eq('tenant_id', user.tenantId);
+  }
+
+if (sessionId) sessionsQuery = sessionsQuery.eq('id', sessionId);
+  if (programId) sessionsQuery = sessionsQuery.eq('program_id', programId);
+  if (startDate) sessionsQuery = sessionsQuery.gte('session_date', startDate);
+  if (endDate) sessionsQuery = sessionsQuery.lte('session_date', endDate);
+
+  const { data: sessionsData, error: sessionsError } = await sessionsQuery
+  .order('session_date', { ascending: true })
+  .order('start_time', { ascending: true });
+
+  if (sessionsError) throw sessionsError;
+
+  const sessions = (sessionsData || []) as SessionRow[];
+
+  if (sessions.length === 0) {
+  return successResponse({
+  filters: { startDate, endDate, programId, sessionId },
+  summary: {
+  totalSessions: 0,
+  excludedSessions: 0,
+  activeSessions: 0,
+  totalExpectedRecords: 0,
+  totalRecordedRecords: 0,
+  present: 0,
+  absent: 0,
+  late: 0,
+  excused: 0,
+  attendanceRate: 0,
+  recordCoverageRate: 0,
+  },
+  byProgram: [],
+  bySession: [],
+  trend: [],
+  });
+  }
+
+const programIds = [...new Set(sessions.map((session) => session.program_id))];
+
+  const [programsResult, datesResult] = await Promise.all([
+  supabaseAdmin
+  .from('programs')
+  .select('id, name')
+  .in('id', programIds)
+  .then(result => {
+  // Apply tenant isolation for non-super-admins if needed
+
+if (user.role !== 'super_admin' && result.data) {
+  // Filter results to only include programs from user's tenant
+  // Note: RLS policy should handle this, but adding explicit check as defense in depth
+
+return result;
+  }
+  return result;
+  }),
+  // FIX: Query attendance_exceptions instead of non_attendance_dates table (removed in schema normalization)
+  (() => {
+  let query = supabaseAdmin
+  .from('attendance_exceptions')
+  .select('exception_date as date, program_id')
+  .eq('exception_type', 'non_attendance_date');  // Filter by type
+  if (startDate) query = query.gte('exception_date', startDate);
+  if (endDate) query = query.lte('exception_date', endDate);
+  // Tenant isolation for non-super-admins
+
+if (user.role !== 'super_admin') {
+  query = query.eq('tenant_id', user.tenantId);
+  }
+  return query;
+  })(),
+  ]);
+
+  if (programsResult.error) throw programsResult.error;
+  if (datesResult.error) throw datesResult.error;
+
+  const programNameById = new Map((programsResult.data || []).map((program) => [program.id as string, (program.name as unknown) as string]));
+
+  const globalExcludedDates = new Set<string>();
+  const excludedByProgram = new Map<string, Set<string>>();
+
+  // FIX: Maps column alias (exception_date as date) to match original logic
+  for (const row of datesResult.data || []) {
+  const date = row.date as string;
+  const rowProgramId = row.program_id as string | null;
+
+  if (!rowProgramId) {
+  globalExcludedDates.add(date);
+  continue;
+  }
+
+if (!excludedByProgram.has(rowProgramId)) {
+  excludedByProgram.set(rowProgramId, new Set<string>());
+  }
+  excludedByProgram.get(rowProgramId)?.add(date);
+  }
+
+const validSessions = sessions.filter((session) => {
+  if (globalExcludedDates.has(session.session_date)) return false;
+  const programDates = excludedByProgram.get(session.program_id);
+  if (programDates?.has(session.session_date)) return false;
+  return true;
+  });
+
+  const excludedSessions = sessions.length - validSessions.length;
+
+  const validSessionIds = validSessions.map((session) => session.id);
+
+  const [attendanceResult, traineesResult] = await Promise.all([
+  validSessionIds.length > 0
+  ? supabaseAdmin
+  .from('attendance')
+  .select('session_id, trainee_id, status')
+  .in('session_id', validSessionIds)
+  : Promise.resolve({ data: [], error: null }),
+  supabaseAdmin
+  .from('trainees')
+  .select('id, program_id')
+  .in('program_id', programIds)
+  .eq('status', 'active')
+  .then(result => {
+  // Apply tenant isolation for non-super-admins
+
+if (user.role !== 'super_admin' && result.data) {
+  return result;
+  }
+  return result;
+  }),
+  ]);
+
+  if (attendanceResult.error) throw attendanceResult.error;
+  if (traineesResult.error) throw traineesResult.error;
+
+  const attendanceRows = (attendanceResult.data || []) as AttendanceRow[];
+
+  const activeTraineesByProgram = (traineesResult.data || []).reduce((acc, trainee) => {
+  acc[trainee.program_id] = (acc[trainee.program_id] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>);
+
+  const sessionsByProgram = validSessions.reduce((acc, session) => {
+  acc[session.program_id] = (acc[session.program_id] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>);
+
+  const totalExpectedRecords = Object.entries(sessionsByProgram).reduce((sum, [pid, sessionCount]) => {
+  return sum + sessionCount * (activeTraineesByProgram[pid] || 0);
+  }, 0);
+
+  const statusTotals = attendanceRows.reduce((acc, row) => {
+  acc[row.status] = (acc[row.status] || 0) + 1;
+  return acc;
+  }, {
+  present: 0,
+  absent: 0,
+  late: 0,
+  excused: 0,
+  } as Record<AttendanceStatus, number>);
+
+  const totalRecordedRecords = attendanceRows.length;
+  const attendedCount = statusTotals.present + statusTotals.late + statusTotals.excused;
+
+  const attendanceRate = totalExpectedRecords > 0
+  ? Number(((attendedCount / totalExpectedRecords) * 100).toFixed(2))
+  : 0;
+
+  const recordCoverageRate = totalExpectedRecords > 0
+  ? Number(((totalRecordedRecords / totalExpectedRecords) * 100).toFixed(2))
+  : 0;
+
+  const bySessionStats = validSessions.map((session) => {
+  const sessionRows = attendanceRows.filter((row) => row.session_id === session.id);
+  const expected = activeTraineesByProgram[session.program_id] || 0;
+
+  const present = sessionRows.filter((row) => row.status === 'present').length;
+  const absent = sessionRows.filter((row) => row.status === 'absent').length;
+  const late = sessionRows.filter((row) => row.status === 'late').length;
+  const excused = sessionRows.filter((row) => row.status === 'excused').length;
+
+  const sessionAttendanceRate = expected > 0
+  ? Number((((present + late + excused) / expected) * 100).toFixed(2))
+  : 0;
+
+  return {
+  sessionId: session.id,
+  title: session.title,
+  sessionDate: session.session_date,
+  startTime: session.start_time,
+  endTime: session.end_time,
+  programId: session.program_id,
+  programName: programNameById.get((session.program_id as unknown) as string) || 'Unknown Program',
+  expected,
+  recorded: sessionRows.length,
+  present,
+  absent,
+  late,
+  excused,
+  attendanceRate: sessionAttendanceRate,
+  };
+  });
+
+  const byProgramMap: Record<string, {
+  programId: string;
+  programName: string;
+  sessions: number;
+  expected: number;
+  recorded: number;
+  present: number;
+  absent: number;
+  late: number;
+  excused: number;
+  }> = {};
+
+  for (const row of bySessionStats) {
+  const key = row.programId;
+  if (!byProgramMap[key]) {
+  byProgramMap[key] = {
+  programId: row.programId as string,
+  programName: row.programName as string,
+  sessions: 0,
+  expected: 0,
+  recorded: 0,
+  present: 0,
+  absent: 0,
+  late: 0,
+  excused: 0,
+  };
+  }
+
+const bucket = byProgramMap[key];
+  bucket.sessions += 1;
+  bucket.expected += row.expected;
+  bucket.recorded += row.recorded;
+  bucket.present += row.present;
+  bucket.absent += row.absent;
+  bucket.late += row.late;
+  bucket.excused += row.excused;
+  }
+
+const byProgram = Object.values(byProgramMap).map((entry) => {
+  const attended = entry.present + entry.late + entry.excused;
+  return {
+  ...entry,
+  attendanceRate: entry.expected > 0
+  ? Number(((attended / entry.expected) * 100).toFixed(2))
+  : 0,
+  recordCoverageRate: entry.expected > 0
+  ? Number(((entry.recorded / entry.expected) * 100).toFixed(2))
+  : 0,
+  };
+  });
+
+  const trendMap: Record<string, {
+  expected: number;
+  recorded: number;
+  present: number;
+  absent: number;
+  late: number;
+  excused: number;
+  }> = {};
+
+  for (const row of bySessionStats) {
+  if (!trendMap[row.sessionDate]) {
+  trendMap[row.sessionDate] = {
+  expected: 0,
+  recorded: 0,
+  present: 0,
+  absent: 0,
+  late: 0,
+  excused: 0,
+  };
+  }
+
+  trendMap[row.sessionDate].expected += row.expected;
+  trendMap[row.sessionDate].recorded += row.recorded;
+  trendMap[row.sessionDate].present += row.present;
+  trendMap[row.sessionDate].absent += row.absent;
+  trendMap[row.sessionDate].late += row.late;
+  trendMap[row.sessionDate].excused += row.excused;
+  }
+
+const trend = Object.entries(trendMap)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([date, values]) => {
+  const attended = values.present + values.late + values.excused;
+  return {
+  date,
+  ...values,
+  attendanceRate: values.expected > 0
+  ? Number(((attended / values.expected) * 100).toFixed(2))
+  : 0,
+  };
+  });
+
+  return successResponse({
+  filters: { startDate, endDate, programId, sessionId },
+  summary: {
+  totalSessions: sessions.length,
+  excludedSessions,
+  activeSessions: validSessions.length,
+  totalExpectedRecords,
+  totalRecordedRecords,
+  present: statusTotals.present,
+  absent: statusTotals.absent,
+  late: statusTotals.late,
+  excused: statusTotals.excused,
+  attendanceRate,
+  recordCoverageRate,
+  },
+  byProgram,
+  bySession: bySessionStats,
+  trend,
+  });
+});

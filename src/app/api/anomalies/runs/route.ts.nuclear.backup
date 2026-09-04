@@ -1,0 +1,26 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { anomalyService } from '@/services/anomalyService';
+import { requireAuthAsync } from '@/middleware/auth';
+import { successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/anomalies/runs - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/anomalies/runs - Get anomaly detection run history
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const { searchParams } = new URL(request.url);
+  const limitParam = Number(searchParams.get('limit') || '20');
+  const limit = Number.isNaN(limitParam) ? 20 : limitParam;
+
+  const runs = await anomalyService.getDetectionRuns(limit);
+  return successResponse(runs);
+});

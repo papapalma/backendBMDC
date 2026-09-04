@@ -1,0 +1,93 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { deleteFile, deleteImageWithThumbnail, getDefaultThumbnailPath, uploadFile, UploadCategory } from '@/utils/fileUpload';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { requireAuthAsync } from '@/middleware/auth';
+
+// Note: Body size limits are configured in next.config.js
+// App Router handles JSON body parsing automatically
+
+// OPTIONS /api/upload - Handle CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+/**
+ * POST /api/upload
+ * Upload a file to the server
+ *
+ * Body:
+ * - file: base64 encoded file
+ * - category: 'items' | 'trainees' | 'programs' | 'cms' | 'qrcodes' | 'documents'
+ * - filename: original filename
+ * - prefix: optional prefix for the filename (e.g., 'item_123')
+ */
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const body = await request.json();
+  const { file, category, filename, prefix } = body;
+
+  if (!file)  throw new Error('File is required');
+  if (!category) throw new Error('Category is required');
+  if (!filename) throw new Error('Filename is required');
+
+  const validCategories: UploadCategory[] = [
+  'items', 'trainees', 'programs', 'cms', 'qrcodes', 'documents',
+  ];
+
+  if (!validCategories.includes(category)) {
+  throw new Error(`Invalid category. Must be one of: ${validCategories.join(', ')}`);
+  }
+
+const result = await uploadFile(file, category, filename, prefix);
+
+  if (!result.success) {
+  throw new Error(result.error || 'Upload failed');
+  }
+
+  return NextResponse.json({
+  success: true,
+  data: {
+  filePath: result.filePath,  // relative path stored in DB, e.g. /uploads/images/items/photo.jpg
+  url: result.url,  // full URL for display, e.g. http://localhost:3001/uploads/...
+  thumbnailPath: result.thumbnailPath,
+  thumbnailUrl: result.thumbnailUrl,
+  defaultThumbnailPath: getDefaultThumbnailPath(),
+  },
+  });
+});
+
+/**
+ * DELETE /api/upload
+ * Delete a file from the server.
+ * For image uploads, this also removes the generated thumbnail.
+ *
+ * Body:
+ * - filePath: relative upload path (e.g., /uploads/images/items/file.jpg)
+ */
+export const DELETE = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const body = await request.json();
+  const { filePath } = body || {};
+
+  if (!filePath || typeof filePath !== 'string') {
+  throw new Error('filePath is required');
+  }
+
+const deleted = filePath.startsWith('/uploads/images/')
+  ? await deleteImageWithThumbnail(filePath)
+  : await deleteFile(filePath);
+
+  if (!deleted) {
+  throw new Error('Failed to delete file');
+  }
+
+  return NextResponse.json({
+  success: true,
+  message: 'File deleted successfully',
+  });
+});

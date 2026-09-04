@@ -1,0 +1,34 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { anomalyService } from '@/services/anomalyService';
+import { requireAuthAsync } from '@/middleware/auth';
+import { successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/anomalies/summary - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/anomalies/summary - Get anomaly summary statistics (tenant-scoped)
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const tenantId = authResult.user.tenantId;
+  const isSuperAdmin = authResult.user.role === 'super_admin';
+  const stats = await anomalyService.getAnomalyStats(!isSuperAdmin ? tenantId : undefined);
+
+  return successResponse({
+    total: stats.total,
+    critical: stats.bySeverity['critical'] || 0,
+    warning: stats.bySeverity['warning'] || 0,
+    info: stats.bySeverity['info'] || 0,
+    open: stats.byStatus['open'] || 0,
+    in_progress: stats.byStatus['in_progress'] || 0,
+    resolved: stats.byStatus['resolved'] || 0,
+    dismissed: stats.byStatus['dismissed'] || 0,
+  });
+});

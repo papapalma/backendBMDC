@@ -1,0 +1,118 @@
+﻿/**
+ * GET /api/admin/accounts
+ *
+ * Returns all local_admin accounts across every tenant on the platform.
+ * Each record includes the tenant name so the superadmin can see which
+ * LGU each admin belongs to.
+ *
+ * Access: Super Admin only
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/utils/logger';
+
+// OPTIONS /api/admin/accounts — CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+/**
+ * GET /api/admin/accounts
+ *
+ * Returns every user whose role is 'local_admin', joined with their
+ * tenant name via the users_tenants junction table.
+ */
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  // ── 1. Authenticate ──────────────────────────────────────────────────────
+  const contextResult = requireTenantContext(request);
+  if (contextResult.error) return contextResult.error as NextResponse;
+
+  const { userId, role, isSuperAdmin } = contextResult.context;
+
+  // ── 2. Authorise: Super Admin only ───────────────────────────────────────
+  if (!isSuperAdmin) {
+    logger.warn('[ADMIN_ACCOUNTS] Non-super-admin attempted to list local admin accounts', {
+      userId,
+      role,
+      url: request.url,
+    });
+    return forbiddenResponse('Only Super Admins can view all local admin accounts');
+  }
+
+  // ── 3. Parse optional query params ───────────────────────────────────────
+  const { searchParams } = new URL(request.url);
+  const search = searchParams.get('search')?.trim() ?? '';
+
+  // ── 4. Fetch all local_admin users with their tenant names ───────────────
+  //
+  // users_tenants can have multiple rows per user (a user could belong to
+  // several tenants), but local_admins are created one-per-tenant so we
+  // use a LEFT JOIN and return all rows.  If a user somehow has no tenant
+  // link the tenant fields will be null.
+  let query = supabaseAdmin
+    .from('users')
+    .select(`
+      id,
+      email,
+      username,
+      role,
+      created_at,
+      updated_at,
+      users_tenants (
+        tenant_id,
+        is_primary,
+        tenants (
+          id,
+          name,
+          status,
+          contact_email
+        )
+      )
+    `)
+    .eq('role', 'local_admin')
+    .order('created_at', { ascending: false });
+
+  if (search) {
+    query = query.or(`email.ilike.%${search}%,username.ilike.%${search}%`);
+  }
+
+  const { data: users, error } = await query;
+  if (error) throw error;
+
+  // ── 5. Flatten so each row surfaces the primary tenant (or first) ─────────
+  const result = (users ?? []).map((u) => {
+    const tenantLinks: any[] = (u.users_tenants as any[]) ?? [];
+
+    // Prefer the primary tenant link; fall back to the first one
+    const primaryLink =
+      tenantLinks.find((tl) => tl.is_primary) ?? tenantLinks[0] ?? null;
+
+    const tenant = primaryLink?.tenants ?? null;
+
+    return {
+      id: u.id,
+      email: u.email,
+      username: u.username,
+      role: u.role,
+      created_at: u.created_at,
+      updated_at: u.updated_at,
+      tenant_id: tenant?.id ?? null,
+      tenant_name: tenant?.name ?? null,
+      tenant_status: tenant?.status ?? null,
+      tenant_contact_email: tenant?.contact_email ?? null,
+    };
+  });
+
+  logger.info('[ADMIN_ACCOUNTS] Local admin accounts retrieved', {
+    count: result.length,
+    requestedBy: userId,
+  });
+
+  return successResponse(result, `${result.length} local admin account(s) retrieved`);
+});

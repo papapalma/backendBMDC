@@ -1,0 +1,803 @@
+openapi: 3.0.0
+info:
+  title: Social Program Sharing API
+  description: API endpoints for sharing programs on social media and tracking enrollments
+  version: 1.0.0
+  contact:
+    name: BMDC Development Team
+    url: https://bmdc.online
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.bmdc.online
+    description: Production API
+  - url: https://staging-api.bmdc.online
+    description: Staging API
+  - url: http://localhost:3000
+    description: Development API
+
+tags:
+  - name: Program Sharing
+    description: Endpoints for generating and validating shareable program links
+  - name: Access Control
+    description: Endpoints for verifying user permissions and access
+  - name: Enrollment
+    description: Endpoints for creating and tracking enrollments
+
+paths:
+  /api/programs/{id}/share-link:
+    get:
+      tags:
+        - Program Sharing
+      summary: Generate a shareable link for a program
+      description: |
+        Generates a shareable URL with embedded program ID that can be distributed on social media platforms.
+        This endpoint is idempotent - calling it multiple times for the same program produces identical results.
+        
+        **Authentication**: Requires admin role
+        **Rate Limit**: 10 requests per minute per user
+      operationId: generateShareLink
+      parameters:
+        - name: id
+          in: path
+          description: The program ID (UUID)
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6
+      security:
+        - BearerAuth: [admin]
+      responses:
+        '200':
+          description: Successfully generated shareable link
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ShareableLinkResponse'
+                  message:
+                    type: string
+                    example: Link generated successfully
+        '401':
+          description: Authentication required or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Insufficient permissions (admin role required)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+            example: 10
+          description: Request limit per minute
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+            example: 7
+          description: Remaining requests in this minute
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+            example: 1705318305
+          description: Unix timestamp when rate limit resets
+
+  /api/programs/{id}/validate-share:
+    get:
+      tags:
+        - Program Sharing
+      summary: Validate a program for sharing
+      description: |
+        Validates that a program exists, is active, and is available for public enrollment via shared links.
+        This is a public endpoint called by frontend when user clicks a shared link.
+        
+        **Authentication**: None required (public endpoint)
+        **Rate Limit**: 20 requests per minute per IP
+      operationId: validateProgramShare
+      parameters:
+        - name: id
+          in: path
+          description: The program ID (UUID)
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6
+      responses:
+        '200':
+          description: Validation result (valid or invalid)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidProgramResponse'
+                  - $ref: '#/components/schemas/InvalidProgramResponse'
+        '400':
+          description: Invalid program ID format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+            example: 20
+          description: Request limit per minute
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+            example: 15
+          description: Remaining requests in this minute
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+            example: 1705318305
+          description: Unix timestamp when rate limit resets
+
+  /api/programs/{id}/verify-access:
+    post:
+      tags:
+        - Access Control
+      summary: Verify trainee access to a program
+      description: |
+        Checks if a trainee has permission to enroll in a program.
+        Verifies prerequisites, capacity, existing enrollment, and other access conditions.
+        
+        **Authentication**: Requires valid JWT token
+        **Rate Limit**: 30 requests per minute per user
+      operationId: verifyProgramAccess
+      parameters:
+        - name: id
+          in: path
+          description: The program ID (UUID)
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - traineeId
+              properties:
+                traineeId:
+                  type: string
+                  format: uuid
+                  description: The trainee ID to check access for
+                  example: b2c3d4e5-f6a7-48b9-i0j1-k2l3m4n5o6p7
+      responses:
+        '200':
+          description: Access verification result
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/AccessGrantedResponse'
+                  - $ref: '#/components/schemas/AccessDeniedResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '401':
+          description: Authentication required or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '404':
+          description: Program or trainee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+            example: 30
+          description: Request limit per minute
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+            example: 25
+          description: Remaining requests in this minute
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+            example: 1705318305
+          description: Unix timestamp when rate limit resets
+
+  /api/enrollments:
+    post:
+      tags:
+        - Enrollment
+      summary: Create a new enrollment
+      description: |
+        Creates an enrollment record for a trainee in a program.
+        The 'source' field tracks where the enrollment originated (social share, direct, admin assigned).
+        
+        **Authentication**: Requires valid JWT token
+        **Rate Limit**: 5 requests per minute per user
+      operationId: createEnrollment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - traineeId
+                - programId
+              properties:
+                traineeId:
+                  type: string
+                  format: uuid
+                  description: The trainee being enrolled
+                  example: b2c3d4e5-f6a7-48b9-i0j1-k2l3m4n5o6p7
+                programId:
+                  type: string
+                  format: uuid
+                  description: The program to enroll in
+                  example: a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6
+                source:
+                  type: string
+                  enum:
+                    - direct
+                    - social_share
+                    - admin_assigned
+                  default: direct
+                  description: Origin of enrollment
+                  example: social_share
+      responses:
+        '201':
+          description: Enrollment successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/EnrollmentResponse'
+                  message:
+                    type: string
+                    example: Successfully enrolled in program
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '401':
+          description: Authentication required or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '404':
+          description: Program or trainee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: Duplicate enrollment (trainee already enrolled)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DuplicateEnrollmentError'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+            example: 5
+          description: Request limit per minute
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+            example: 2
+          description: Remaining requests in this minute
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+            example: 1705318305
+          description: Unix timestamp when rate limit resets
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token obtained from authentication endpoint.
+        Include in Authorization header: Authorization: Bearer {token}
+
+  schemas:
+    # Response Schemas
+    ShareableLinkResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The fully-formed shareable URL
+          example: https://bmdc.online/share?program_id=a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6
+        programId:
+          type: string
+          format: uuid
+          example: a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6
+        generatedAt:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:30:00Z
+        generatedBy:
+          type: string
+          format: email
+          example: admin@example.com
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Link expiration (null = never expires)
+          example: null
+        openGraph:
+          $ref: '#/components/schemas/OpenGraphMetadata'
+
+    ValidProgramResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            isValid:
+              type: boolean
+              example: true
+            isActive:
+              type: boolean
+              example: true
+            isPublic:
+              type: boolean
+              example: true
+            program:
+              $ref: '#/components/schemas/ProgramData'
+        message:
+          type: string
+          example: Program is valid and available for enrollment
+
+    InvalidProgramResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            isValid:
+              type: boolean
+              example: false
+            isActive:
+              type: boolean
+              example: false
+            isPublic:
+              type: boolean
+              example: true
+            error:
+              type: string
+              enum:
+                - program_inactive
+                - program_not_public
+                - program_full
+                - program_deleted
+              example: program_inactive
+            message:
+              type: string
+              example: This program is no longer available
+
+    AccessGrantedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            canAccess:
+              type: boolean
+              example: true
+            hasEnrolled:
+              type: boolean
+              example: false
+            reason:
+              type: string
+              example: trainee_eligible
+            details:
+              type: object
+              properties:
+                meetsPrerequisites:
+                  type: boolean
+                  example: true
+                hasAvailableSeats:
+                  type: boolean
+                  example: true
+                programStatus:
+                  type: string
+                  example: active
+        message:
+          type: string
+          example: Trainee is eligible to enroll in this program
+
+    AccessDeniedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            canAccess:
+              type: boolean
+              example: false
+            hasEnrolled:
+              type: boolean
+              example: true
+            reason:
+              type: string
+              enum:
+                - trainee_eligible
+                - already_enrolled
+                - program_full
+                - prerequisites_not_met
+                - program_inactive
+                - insufficient_permissions
+              example: already_enrolled
+            details:
+              type: object
+              properties:
+                enrollmentId:
+                  type: string
+                  format: uuid
+                  example: c3d4e5f6-a7b8-49c0-j1k2-l3m4n5o6p7q8
+                enrollmentDate:
+                  type: string
+                  format: date-time
+                  example: 2024-01-10T14:30:00Z
+                status:
+                  type: string
+                  example: active
+        message:
+          type: string
+          example: Trainee is already enrolled in this program
+
+    EnrollmentResponse:
+      type: object
+      properties:
+        enrollmentId:
+          type: string
+          format: uuid
+          example: e5f6a7b8-c9d0-50e1-k2l3-m4n5o6p7q8r9
+        traineeId:
+          type: string
+          format: uuid
+          example: b2c3d4e5-f6a7-48b9-i0j1-k2l3m4n5o6p7
+        programId:
+          type: string
+          format: uuid
+          example: a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6
+        source:
+          type: string
+          enum:
+            - direct
+            - social_share
+            - admin_assigned
+          example: social_share
+          description: Origin of the enrollment
+        enrollmentDate:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:45:00Z
+        status:
+          type: string
+          example: enrolled
+        startDate:
+          type: string
+          format: date-time
+          example: 2024-01-20T09:00:00Z
+        endDate:
+          type: string
+          format: date-time
+          example: 2024-02-15T17:00:00Z
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 0
+
+    ProgramData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        duration:
+          type: string
+          example: 4 weeks
+        maxTrainees:
+          type: integer
+          example: 30
+        enrolledCount:
+          type: integer
+          example: 24
+        availableSeats:
+          type: integer
+          example: 6
+        status:
+          type: string
+          enum:
+            - active
+            - upcoming
+            - completed
+            - cancelled
+          example: upcoming
+        instructorName:
+          type: string
+        image:
+          type: string
+          format: uri
+        prerequisites:
+          type: array
+          items:
+            type: string
+          example:
+            - Basic JavaScript knowledge
+            - HTML/CSS fundamentals
+
+    OpenGraphMetadata:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Enroll in Advanced JavaScript Programming
+        description:
+          type: string
+          example: Master modern JavaScript concepts. Starts January 20, 2024.
+        image:
+          type: string
+          format: uri
+          nullable: true
+        url:
+          type: string
+          format: uri
+
+    # Error Schemas
+    UnauthorizedError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - UNAUTHORIZED
+                - INVALID_TOKEN
+                - EXPIRED_TOKEN
+                - MISSING_TOKEN
+              example: UNAUTHORIZED
+            message:
+              type: string
+              example: Authentication required. Please provide a valid JWT token.
+            details:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  example: missing_token
+
+    ForbiddenError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - INSUFFICIENT_PERMISSIONS
+                - FORBIDDEN
+              example: INSUFFICIENT_PERMISSIONS
+            message:
+              type: string
+              example: You do not have permission to generate links for this program.
+            details:
+              type: object
+              properties:
+                requiredRole:
+                  type: string
+                  example: admin
+                userRole:
+                  type: string
+                  example: trainee
+
+    NotFoundError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - PROGRAM_NOT_FOUND
+                - TRAINEE_NOT_FOUND
+                - NOT_FOUND
+              example: PROGRAM_NOT_FOUND
+            message:
+              type: string
+              example: Program with ID 'xyz' does not exist.
+            details:
+              type: object
+              properties:
+                programId:
+                  type: string
+                  format: uuid
+
+    InvalidRequestError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - INVALID_REQUEST
+                - INVALID_PROGRAM_ID
+                - INVALID_SOURCE
+              example: INVALID_REQUEST
+            message:
+              type: string
+              example: Invalid request parameters
+            details:
+              type: object
+              properties:
+                missingFields:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - traineeId
+                    - programId
+
+    DuplicateEnrollmentError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - DUPLICATE_ENROLLMENT
+              example: DUPLICATE_ENROLLMENT
+            message:
+              type: string
+              example: Trainee is already enrolled in this program
+            details:
+              type: object
+              properties:
+                existingEnrollmentId:
+                  type: string
+                  format: uuid
+                enrollmentDate:
+                  type: string
+                  format: date-time
+
+    RateLimitError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - RATE_LIMIT_EXCEEDED
+              example: RATE_LIMIT_EXCEEDED
+            message:
+              type: string
+              example: Too many requests. Maximum 10 requests per minute allowed.
+            details:
+              type: object
+              properties:
+                resetAfter:
+                  type: integer
+                  description: Seconds until rate limit resets
+                  example: 45
+                retryAfter:
+                  type: string
+                  format: date-time
+                  example: 2024-01-15T10:31:45Z

@@ -1,0 +1,31 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+import { requireTenantContext } from '@/middleware/tenantContext';
+
+import { successResponse } from '@/utils/responses';
+
+import { withErrorHandler } from '@/middleware/errorHandler';
+
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/lendings/stats - Handle CORS preflightexport async function OPTIONS(request: NextRequest) {  return handleOptionsRequest(request);}// GET /api/lendings/stats - Get lending statistics (tenant-scoped)export const GET = withErrorHandler(async (request: NextRequest) => {  const ctxResult = requireTenantContext(request);  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, isSuperAdmin } = ctxResult.context;  let query = supabaseAdmin    .from('lendings')    .select('id, status, expected_return_date, actual_return_date, tenant_id');  if (!isSuperAdmin) {    query = query.eq('tenant_id', tenantId);  }  const { data: lendings, error } = await query;  if (error) throw error;
+
+  const rows = lendings || [];
+
+  const now = new Date();
+
+  const todayStart = new Date(now);  todayStart.setHours(0, 0, 0, 0);
+
+  const todayEnd = new Date(now);  todayEnd.setHours(23, 59, 59, 999);
+
+  const overdueCount = rows.filter((lending) => {    if (lending.status === 'overdue') return true;    if (lending.status !== 'active' || !lending.expected_return_date) return false;    return new Date(lending.expected_return_date) < now;  }).length;
+
+  const byStatus: Record<string, number> = {};  rows.forEach((lending) => {    const status = lending.status || 'unknown';    byStatus[status] = (byStatus[status] || 0) + 1;  });
+
+  const dueToday = rows.filter((lending) => {    if (!lending.expected_return_date || lending.status !== 'active') return false;
+
+    const dueDate = new Date(lending.expected_return_date);    return dueDate >= todayStart && dueDate <= todayEnd;  }).length;  return successResponse({    totalRecords: rows.length,    active: rows.filter((lending) => lending.status === 'active').length,    returned: rows.filter((lending) => lending.status === 'returned').length,    overdue: overdueCount,    lost: rows.filter((lending) => lending.status === 'lost').length,    dueToday,    byStatus,  });});

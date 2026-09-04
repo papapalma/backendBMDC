@@ -1,0 +1,41 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { anomalyService } from '@/services/anomalyService';
+import { activityLogService } from '@/services/activityLogService';
+import { requireRoleAsync } from '@/middleware/auth';
+import { dismissBulkAnomaliesSchema } from '@/utils/validators';
+import { successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/anomalies/dismiss-bulk - Handle CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// POST /api/anomalies/dismiss-bulk - Dismiss multiple anomalies
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['local_admin', 'staff_inventory_manager', 'staff_training_coordinator']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const body = await request.json();
+  const validatedData = dismissBulkAnomaliesSchema.parse(body);
+
+  const result = await anomalyService.dismissAnomalies(
+    validatedData.ids,
+    validatedData.reason,
+    authResult.user.userId
+  );
+
+  await activityLogService.logAction(
+    authResult.user.userId,
+    'dismiss_bulk',
+    'anomaly',
+    'bulk-dismiss',
+    {
+      ids_count: validatedData.ids.length,
+      dismissed: result.dismissed,
+    }
+  );
+
+  return successResponse(result, 'Bulk dismiss completed');
+});

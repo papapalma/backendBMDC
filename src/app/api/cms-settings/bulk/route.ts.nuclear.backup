@@ -1,0 +1,72 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { requireAuthAsync } from '@/middleware/auth';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+/**
+ * OPTIONS /api/cms-settings/bulk - Handle CORS preflight
+ */
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+/**
+ * POST /api/cms-settings/bulk
+ * Bulk upsert multiple CMS settings for the current tenant.
+ * Requires authentication.
+ *
+ * Body: { settings: Record<string, any> }
+ * Flattens nested objects into key-value pairs (e.g., hero.title -> hero_title)
+ */
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const tenantId = authResult.user.tenantId;
+  if (!tenantId) throw new Error('Tenant context is required');
+
+  const body = await request.json();
+  const settings = body.settings || body;
+
+  if (!settings || typeof settings !== 'object') {
+    throw new Error('Settings object is required');
+  }
+
+  // Flatten nested settings object into key-value pairs
+  const flattenSettings = (obj: Record<string, any>, prefix = ''): Array<[string, string]> => {
+    const result: Array<[string, string]> = [];
+    for (const [key, val] of Object.entries(obj)) {
+      if (typeof val === 'object' && !Array.isArray(val) && val !== null) {
+        result.push(...flattenSettings(val, `${prefix}${key}_`));
+      } else {
+        const fullKey = prefix ? `${prefix}${key}` : key;
+        result.push([fullKey, String(val || '')]);
+      }
+    }
+    return result;
+  };
+
+  const flatSettings = flattenSettings(settings);
+  
+  const upsertData = flatSettings.map(([key, value]) => ({
+    tenant_id: tenantId,
+    key,
+    value,
+    description: key,
+    updated_at: new Date().toISOString(),
+  }));
+
+  const { data, error } = await supabaseAdmin
+    .from('cms_settings')
+    .upsert(upsertData, { onConflict: 'tenant_id,key' })
+    .select();
+
+  if (error) throw error;
+
+  return NextResponse.json({
+    success: true,
+    data,
+    message: `Updated ${data?.length || 0} settings`,
+  });
+});

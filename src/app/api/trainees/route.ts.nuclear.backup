@@ -1,0 +1,74 @@
+﻿/**
+ * GET  /api/trainees  — list trainees (tenant-scoped, Req 9.2)
+ * POST /api/trainees  — create trainee (tenant-scoped, Req 9.2, 22.1)
+ *
+ * Requirements: 9.2, 9.3, 9.10, 22.1
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { traineeService } from '@/services/traineeService';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { createTraineeSchema } from '@/utils/validators';
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { activityLogService } from '@/services/activityLogService';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/trainees - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/trainees - Get all trainees scoped to the requesting user's tenant (Req 9.2)
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const context = ctxResult.context;
+  const { searchParams } = new URL(request.url);
+
+  const program_id = searchParams.get('program_id') || undefined;
+  const status = searchParams.get('status') || undefined;
+  const search = searchParams.get('search') || undefined;
+
+  // Pass full context to service (Task 3.3: Services need isSuperAdmin flag)
+  const trainees = await traineeService.getAllTrainees(context, {
+  program_id,
+  status,
+  search,
+  });
+  return successResponse(trainees);
+});
+
+// POST /api/trainees - Create new trainee associated with the user's tenant (Req 9.2, 22.1)
+
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId, role } = ctxResult.context;
+
+  const allowedRoles = ['local_admin', 'staff_training_coordinator'];
+  if (!allowedRoles.includes(role)) {
+  return forbiddenResponse('Insufficient permissions to create trainees');
+  }
+
+const body = await request.json();
+  const validatedData = createTraineeSchema.parse(body);
+
+  // Inject tenant_id from JWT — callers cannot override this (Req 9.2)
+  const { trainee: traineeRecord, temp_password } = await traineeService.createTrainee({
+  ...validatedData,
+  tenantId,
+  });
+
+  // Strip PII before storing in activity log (SEC-18)
+  const { email: _e, phone: _p, birth_date: _b, street: _s, province: _pr, municipality: _m, barangay: _ba, ...safeLogData } = validatedData;
+  await activityLogService.logAction(userId, 'create', 'trainee', traineeRecord.id, {
+  ...safeLogData,
+  program_id: validatedData.program_id,
+  }, undefined, tenantId);
+
+  return successResponse({ ...traineeRecord, temp_password }, 'Trainee created successfully', 201);
+});

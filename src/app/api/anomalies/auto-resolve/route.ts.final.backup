@@ -1,0 +1,41 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { anomalyService } from '@/services/anomalyService';
+import { activityLogService } from '@/services/activityLogService';
+import { requireRoleAsync } from '@/middleware/auth';
+import { autoResolveAnomaliesSchema } from '@/utils/validators';
+import { successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/anomalies/auto-resolve - Handle CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// POST /api/anomalies/auto-resolve - Auto-resolve eligible anomalies
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['local_admin', 'staff_inventory_manager', 'staff_training_coordinator']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const body = await request.json();
+  const validatedData = autoResolveAnomaliesSchema.parse(body);
+
+  const result = await anomalyService.autoResolveAnomalies(authResult.user.userId, {
+    category: validatedData.category,
+    olderThanDays: validatedData.olderThanDays,
+  });
+
+  await activityLogService.logAction(
+    authResult.user.userId,
+    'auto_resolve',
+    'anomaly',
+    'auto-resolve',
+    {
+      category: validatedData.category || null,
+      older_than_days: validatedData.olderThanDays || null,
+      resolved: result.resolved,
+    }
+  );
+
+  return successResponse(result, 'Auto-resolve completed');
+});

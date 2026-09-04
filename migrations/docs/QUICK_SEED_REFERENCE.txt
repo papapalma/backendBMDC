@@ -1,0 +1,197 @@
+================================================================================
+                     SUPER ADMIN SEED - QUICK REFERENCE
+================================================================================
+
+FILE: Backend/migrations/014-seed-superadmin.sql
+
+CREDENTIALS:
+  Email:    admin@system.local
+  Username: superadmin
+  Password: Admin123
+  Role:     super_admin
+
+================================================================================
+HOW TO APPLY THE MIGRATION
+================================================================================
+
+Option 1: Supabase SQL Editor (Recommended)
+  1. Open your Supabase project dashboard
+  2. Click SQL Editor → New Query
+  3. Copy-paste contents of 014-seed-superadmin.sql
+  4. Click Run
+  5. Done! Account created.
+
+Option 2: Command Line (psql)
+  psql -U postgres -d your_database -h your_host -f migrations/014-seed-superadmin.sql
+
+Option 3: Docker
+  docker exec container_name psql -U postgres -d database_name -f migrations/014-seed-superadmin.sql
+
+================================================================================
+VERIFY ACCOUNT WAS CREATED
+================================================================================
+
+SELECT id, email, username, role FROM users 
+WHERE email = 'admin@system.local';
+
+Expected: One row with role = 'super_admin'
+
+================================================================================
+TEST LOGIN
+================================================================================
+
+API Test:
+  curl -X POST http://localhost:3003/api/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"admin@system.local","password":"Admin123"}'
+
+Expected: JWT token + user details returned
+
+Web UI Test:
+  1. Go to http://localhost:3000/login
+  2. Email: admin@system.local
+  3. Password: Admin123
+  4. Click Login
+  5. Should see admin dashboard
+
+================================================================================
+SECURITY CHECKLIST
+================================================================================
+
+BEFORE PRODUCTION:
+  ☐ Change password: admin@system.local → new strong password
+  ☐ Create permanent admin account with strong credentials
+  ☐ Delete or disable default account
+  ☐ Store credentials in secrets manager
+  ☐ Never commit this password to git
+
+AFTER PRODUCTION DEPLOYMENT:
+  ☐ Delete default account: DELETE FROM users WHERE email='admin@system.local';
+  ☐ Monitor access logs
+  ☐ Ensure MFA is enabled on permanent admin accounts
+
+================================================================================
+PASSWORD HASH DETAILS
+================================================================================
+
+Algorithm:  bcryptjs (Node.js implementation)
+Cost:       10 (salt rounds)
+Password:   Admin123
+Hash:       $2a$10$LiahozsSKtukMjIxhWKoVOpSjj2g.8iUgTPidylY5aQlLE7dByK0q
+
+Verification (Node.js):
+  const bcrypt = require('bcryptjs');
+  const valid = bcrypt.compareSync(
+    'Admin123',
+    '$2a$10$LiahozsSKtukMjIxhWKoVOpSjj2g.8iUgTPidylY5aQlLE7dByK0q'
+  );
+  console.log(valid); // true
+
+================================================================================
+MIGRATION PROPERTIES
+================================================================================
+
+Idempotent:     ✅ Yes (safe to run multiple times)
+Transaction:    ✅ Yes (atomic, rolls back on error)
+Reversible:     ✅ Yes (can DELETE account)
+Production OK:  ⚠️  For setup only; must change password before use
+
+================================================================================
+IF ACCOUNT ALREADY EXISTS
+================================================================================
+
+Error Message: "⚠️ Superadmin account already exists (admin@system.local). Skipping creation."
+
+This is safe. Options:
+  1. Keep existing account as-is
+  2. Update password: 
+     UPDATE users SET password_hash='$2a$10$new_hash' 
+     WHERE email='admin@system.local';
+  3. Delete and re-run migration:
+     DELETE FROM users WHERE email='admin@system.local';
+     -- then re-run 014-seed-superadmin.sql
+
+================================================================================
+IF LOGIN FAILS
+================================================================================
+
+Steps to debug:
+  1. Verify account exists:
+     SELECT * FROM users WHERE email='admin@system.local';
+  
+  2. Verify hash is correct:
+     const bcrypt = require('bcryptjs');
+     const valid = bcrypt.compareSync(
+       'Admin123',
+       '$2a$10$LiahozsSKtukMjIxhWKoVOpSjj2g.8iUgTPidylY5aQlLE7dByK0q'
+     );
+     console.log(valid);
+  
+  3. Check API is running: http://localhost:3003/api/health
+  
+  4. Check auth middleware: Backend/src/middleware/auth.ts
+  
+  5. Check password hashing: Backend/src/lib/auth.ts
+
+================================================================================
+RELATED FILES
+================================================================================
+
+Migration Script:      Backend/migrations/014-seed-superadmin.sql
+Documentation:        Backend/migrations/SEED_SUPERADMIN_README.md
+Setup Guide:          SUPERADMIN_SETUP_GUIDE.md (root directory)
+Auth Implementation:   Backend/src/lib/auth.ts
+Database Schema:       Backend/migrations/full_schema.sql
+Login Routes:          Backend/src/app/api/auth/
+
+================================================================================
+KEY OPERATIONS
+================================================================================
+
+Create new hash for custom password:
+  $ node
+  > const bcrypt = require('bcryptjs');
+  > bcrypt.hashSync('NewPassword', 10)
+  '$2a$10$...'
+
+Reset password (SQL):
+  UPDATE users SET password_hash='$2a$10$...' WHERE email='admin@system.local';
+
+Delete account:
+  DELETE FROM users WHERE email='admin@system.local';
+
+Soft disable:
+  UPDATE users SET role='disabled' WHERE email='admin@system.local';
+
+Get all admins:
+  SELECT * FROM users WHERE role IN ('super_admin', 'local_admin');
+
+================================================================================
+NOTES
+================================================================================
+
+• This default account is for INITIAL SETUP only
+• Change password immediately after first login
+• Create permanent admin account with strong password
+• Delete default account before full production
+• Never share this password
+• Never commit to version control
+• Use environment variables in .env files (git-ignored)
+• Monitor admin account logins in audit logs
+• Consider implementing MFA for all admin accounts
+
+================================================================================
+SUPPORT
+================================================================================
+
+For issues or questions:
+  1. Check: Backend/migrations/SEED_SUPERADMIN_README.md
+  2. Review: Backend/src/lib/auth.ts (password implementation)
+  3. Verify: Backend/migrations/full_schema.sql (user table schema)
+  4. Test: Direct SQL queries in Supabase SQL Editor
+
+================================================================================
+Created: August 16, 2026
+Version: 1.0
+Status: ✅ Ready for Use
+================================================================================

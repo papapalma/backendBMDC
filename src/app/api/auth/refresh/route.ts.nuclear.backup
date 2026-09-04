@@ -1,0 +1,101 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { extractCookieValue, generateToken } from '@/lib/auth';
+import { refreshTokenSchema } from '@/utils/validators';
+import { successResponse, unauthorizedResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { checkRateLimit, getRateLimitKey } from '@/utils/rateLimit';
+import { authRecoveryService } from '@/services/authRecoveryService';
+
+const AUTH_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 2;
+const REFRESH_TOKEN_MAX_AGE_SECONDS = Number(process.env.REFRESH_TOKEN_EXPIRES_DAYS || 14) * 24 * 60 * 60;
+
+// OPTIONS /api/auth/refresh - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// POST /api/auth/refresh - Rotate refresh token and issue a new access token
+
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const rlResponse = checkRateLimit(getRateLimitKey(request, 'refresh-token'), {
+  limit: 50,
+  windowMs: 60 * 60 * 1000,
+  });
+  if (rlResponse) return rlResponse as NextResponse;
+
+  const cookieHeader = request.headers.get('cookie');
+  let providedRefreshToken = extractCookieValue(cookieHeader, 'refresh_token');
+
+  if (!providedRefreshToken) {
+  try {
+  const body = await request.json();
+  const parsed = refreshTokenSchema.parse(body);
+  providedRefreshToken = parsed.refreshToken || null;
+  } catch {
+  // Keep null and return unauthorized below.
+  }
+  }
+  if (!providedRefreshToken) {
+  return unauthorizedResponse('Refresh token is required');
+  }
+
+const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+  || request.headers.get('x-real-ip')
+  || undefined;
+  const userAgent = request.headers.get('user-agent') || undefined;
+
+  let rotated;
+  try {
+  rotated = await authRecoveryService.rotateRefreshToken(providedRefreshToken, { ip, userAgent });
+  } catch {
+  return unauthorizedResponse('Invalid or expired refresh token');
+  }
+
+const { data: user, error } = await supabaseAdmin
+  .from('users')
+  .select('id, email, username, role, tenant_id')
+  .eq('id', rotated.userId)
+  .single();
+
+  if (error || !user) {
+  return unauthorizedResponse('User not found');
+  }
+
+const token = generateToken({ userId: user.id, email: user.email, role: user.role, tenantId: user.tenant_id });
+
+  const isProduction = process.env.NODE_ENV === 'production';
+  const response = NextResponse.json({
+  success: true,
+  data: {
+  token,
+  user: {
+  id: user.id,
+  email: user.email,
+  username: user.username,
+  role: user.role,
+  },
+  },
+  message: 'Token refreshed successfully',
+  });
+
+  response.cookies.set('auth_token', token, {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? 'strict' : 'lax',
+  maxAge: AUTH_TOKEN_MAX_AGE_SECONDS,
+  path: '/',
+  });
+
+  response.cookies.set('refresh_token', rotated.token, {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? 'strict' : 'lax',
+  maxAge: REFRESH_TOKEN_MAX_AGE_SECONDS,
+  path: '/',
+  });
+
+  return response;
+});

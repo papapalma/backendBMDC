@@ -1,0 +1,202 @@
+/**
+ * GET  /api/admin/tenants  — list all tenant instances
+ * POST /api/admin/tenants  — create a new tenant instance
+ *
+ * Implements Requirements 1.1–1.6:
+ *   - 1.1  Generate a unique tenant_id using UUID v4
+ *   - 1.2  Initialize the Database_Schema with tenant-specific context
+ *   - 1.3  Create default TenantConfiguration with placeholder branding
+ *   - 1.4  Validate tenant name uniqueness across the Platform
+ *   - 1.5  Store tenant metadata (name, creation date, status, contact info)
+ *   - 1.6  Return all tenant instances with status and configuration summary
+ *
+ * Access: Super Admin only
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { createTenant, getAllTenants } from '@/services/tenantProvisioningService';
+import { createdResponse, errorResponse, forbiddenResponse, successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { logger } from '@/utils/logger';
+
+// ---------------------------------------------------------------------------
+// Validation schema
+// ---------------------------------------------------------------------------
+
+/**
+ * Zod schema for the POST /api/admin/tenants request body.
+ *
+ * Password requirements align with the security policy in the design doc
+ * (Authentication Service → Implementation Notes: bcrypt cost factor 12,
+ * minimum 8 chars, uppercase, lowercase, number, special character).
+ */
+const createTenantSchema = z.object({
+  /** LGU name — must be unique across the platform */
+  name: z
+    .string()
+    .min(2, 'Tenant name must be at least 2 characters')
+    .max(255, 'Tenant name must not exceed 255 characters')
+    .trim(),
+
+  /** Primary contact email for the tenant organisation */
+  contactEmail: z
+    .string()
+    .email('Invalid contact email address')
+    .max(255, 'Contact email must not exceed 255 characters')
+    .toLowerCase()
+    .trim(),
+
+  /** Optional contact phone number */
+  contactPhone: z
+    .string()
+    .max(50, 'Contact phone must not exceed 50 characters')
+    .trim()
+    .optional(),
+
+  /** Optional physical address */
+  address: z
+    .string()
+    .max(1000, 'Address must not exceed 1000 characters')
+    .trim()
+    .optional(),
+
+  /** Email for the default Local Admin account */
+  adminEmail: z
+    .string()
+    .email('Invalid admin email address')
+    .max(255, 'Admin email must not exceed 255 characters')
+    .toLowerCase()
+    .trim(),
+
+  /** Username for the default Local Admin account */
+  adminUsername: z
+    .string()
+    .min(3, 'Admin username must be at least 3 characters')
+    .max(100, 'Admin username must not exceed 100 characters')
+    .regex(
+      /^[a-zA-Z0-9_-]+$/,
+      'Admin username can only contain letters, numbers, hyphens, and underscores'
+    )
+    .trim(),
+
+  /**
+   * Password for the default Local Admin account.
+   * Must be at least 8 characters and contain uppercase, lowercase,
+   * a digit, and a special character.
+   */
+  adminPassword: z
+    .string()
+    .min(8, 'Admin password must be at least 8 characters')
+    .max(100, 'Admin password must not exceed 100 characters')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/,
+      'Admin password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+    ),
+});
+
+// ---------------------------------------------------------------------------
+// Route handlers
+// ---------------------------------------------------------------------------
+
+// OPTIONS /api/admin/tenants — CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+/**
+ * GET /api/admin/tenants
+ *
+ * Returns all tenant instances with their current status and configuration.
+ * Restricted to Super Admin role only (Req 1.6).
+ */
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  // ── 1. Authenticate and extract tenant context ───────────────────────────
+
+const contextResult = requireTenantContext(request);
+  if (contextResult.error) return contextResult.error as NextResponse;
+
+  const { userId, role, isSuperAdmin } = contextResult.context;
+
+  // ── 2. Authorise: Super Admin only ───────────────────────────────────────
+
+if (!isSuperAdmin) {
+    logger.warn('[TENANT_MANAGEMENT] Non-super-admin attempted to list tenants', {
+      userId,
+      role,
+      url: request.url,
+    });
+    return forbiddenResponse('Only Super Admins can list all tenants');
+  }
+
+  // ── 3. Fetch all tenants ─────────────────────────────────────────────────
+
+const tenants = await getAllTenants();
+
+  logger.info('[TENANT_MANAGEMENT] Tenant list retrieved', {
+    count: tenants.length,
+    requestedBy: userId,
+  });
+
+  return successResponse(tenants, `${tenants.length} tenant(s) retrieved`);
+});
+
+/**
+ * POST /api/admin/tenants
+ *
+ * Creates a new tenant instance. Restricted to Super Admin role only.
+ */
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  // ── 1. Authenticate and extract tenant context ───────────────────────────
+
+const contextResult = requireTenantContext(request);
+  if (contextResult.error) return contextResult.error as NextResponse;
+
+  const { userId, role, isSuperAdmin } = contextResult.context;
+
+  // ── 2. Authorise: Super Admin only ───────────────────────────────────────
+
+if (!isSuperAdmin) {
+    logger.warn('[TENANT_PROVISIONING] Non-super-admin attempted tenant creation', {
+      userId,
+      role,
+      url: request.url,
+    });
+    return forbiddenResponse('Only Super Admins can create new tenants');
+  }
+
+  // ── 3. Parse and validate request body ──────────────────────────────────
+
+const body = await request.json();
+  const validatedData = createTenantSchema.parse(body);
+
+  // ── 4. Provision the tenant ──────────────────────────────────────────────
+  logger.info('[TENANT_PROVISIONING] Creating new tenant', {
+    name: validatedData.name,
+    requestedBy: userId,
+  });
+
+  const createdTenantData = await createTenant({
+    name: validatedData.name,
+    contactEmail: validatedData.contactEmail,
+    contactPhone: validatedData.contactPhone,
+    address: validatedData.address,
+    adminEmail: validatedData.adminEmail,
+    adminUsername: validatedData.adminUsername,
+    adminPassword: validatedData.adminPassword,
+  });
+
+  logger.info('[TENANT_PROVISIONING] Tenant created successfully', {
+    tenantId: createdTenantData.id,
+    name: createdTenantData.name,
+    adminUserId: createdTenantData.adminUser.id,
+    requestedBy: userId,
+  });
+
+  // ── 5. Return 201 Created ────────────────────────────────────────────────
+
+return createdResponse(createdTenantData, 'Tenant created successfully');
+});

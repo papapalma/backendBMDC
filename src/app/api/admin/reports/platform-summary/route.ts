@@ -1,0 +1,87 @@
+/**
+ * GET /api/admin/reports/platform-summary
+ *
+ * Aggregated platform-wide summary report (Req 3.3, 3.4, 3.5, 3.6, 10.1–10.6).
+ * Combines data from ALL active tenants. Restricted to Super Admin only.
+ * Cached for 1 hour (Req 10.7). Supports PDF/CSV export (Req 10.8).
+ *
+ * Requirements: 3.3, 3.4, 3.5, 3.6, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { getPlatformSummary } from '@/services/reportingService';
+import {
+  buildSimplePdf,
+  createPdfDownloadResponse,
+  objectsToCsv,
+  createCsvDownloadResponse,
+} from '@/utils/export';
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { userId, isSuperAdmin } = ctxResult.context;
+
+  // Strictly Super Admin only (Req 10.1)
+  if (!isSuperAdmin) {
+    return forbiddenResponse('Platform summary reports are restricted to Super Admin');
+  }
+
+  const { searchParams } = new URL(request.url);
+  const startDate = searchParams.get('start_date') || searchParams.get('startDate') || undefined;
+  const endDate = searchParams.get('end_date') || searchParams.get('endDate') || undefined;
+  const format = searchParams.get('format') || 'json';
+
+  const report = await getPlatformSummary(userId, { startDate, endDate });
+
+  // PDF export (Req 10.8)
+  if (format === 'pdf') {
+    const lines = [
+      `Generated: ${report.generatedAt}`,
+      '',
+      `Total Tenants: ${report.totalTenants}  Active: ${report.activeTenants}`,
+      `Total Programs: ${report.totalPrograms}`,
+      `Total Enrollments: ${report.totalEnrollments}`,
+      `Total Completions: ${report.totalCompletions}`,
+      `Total Trainees: ${report.totalTrainees}`,
+      `Total Items: ${report.totalItems}`,
+      `Total Certificates: ${report.totalCertificates}`,
+      '',
+      '--- Tenant Breakdown ---',
+      ...report.tenantBreakdowns.map(
+        (t) =>
+          `${t.tenantName} (${t.status}): Programs=${t.programs} Enrollments=${t.enrollments} Completions=${t.completions} Trainees=${t.trainees}`
+      ),
+    ];
+    const pdf = buildSimplePdf('Platform Summary Report', lines);
+    return createPdfDownloadResponse(pdf, `platform-summary-${Date.now()}.pdf`);
+  }
+
+  // CSV export (Req 10.8)
+  if (format === 'csv') {
+    const rows = report.tenantBreakdowns.map((t) => ({
+      tenant_id: t.tenantId,
+      tenant_name: t.tenantName,
+      status: t.status,
+      programs: t.programs,
+      enrollments: t.enrollments,
+      completions: t.completions,
+      trainees: t.trainees,
+      items: t.items,
+      certificates: t.certificates,
+    }));
+    const csv = objectsToCsv(rows);
+    return createCsvDownloadResponse(csv, `platform-summary-${Date.now()}.csv`);
+  }
+
+  return successResponse(report);
+});

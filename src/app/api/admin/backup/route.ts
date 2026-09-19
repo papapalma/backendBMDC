@@ -1,0 +1,70 @@
+/**
+ * POST /api/admin/backup  — trigger a database backup (Req 20.5)
+ * GET  /api/admin/backup  — list existing backups (Super Admin only)
+ *
+ * The POST endpoint is designed to be called by an external scheduler:
+ *   - Supabase Edge Functions cron
+ *   - GitHub Actions scheduled workflow
+ *   - System cron: 0 2 * * * curl -X POST https://your-api/api/admin/backup -H "X-Backup-Secret: $SECRET"
+ *   - AWS EventBridge / Cloud Scheduler
+ *
+ * Authentication:
+ *   - Super Admin JWT (for manual triggers via the admin UI)
+ *   - OR X-Backup-Secret header matching BACKUP_SECRET_KEY env var (for automated triggers)
+ *
+ * Requirements: 20.5
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { createBackup, listBackups } from '@/lib/backupService';
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/admin/backup — list existing backups (Super Admin only)
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { isSuperAdmin } = ctxResult.context;
+  if (!isSuperAdmin) {
+  return forbiddenResponse('Backup management is restricted to Super Admin');
+  }
+
+const backups = await listBackups();
+  return successResponse(backups);
+});
+
+// POST /api/admin/backup — trigger a backup
+
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  // ── Auth: Super Admin JWT or backup secret header ─────────────────────────
+
+const backupSecret = process.env.BACKUP_SECRET_KEY;
+  const headerSecret = request.headers.get('x-backup-secret');
+
+  // Allow automated triggers via secret header (for cron jobs)
+
+if (backupSecret && headerSecret === backupSecret) {
+  const result = await createBackup();
+  return successResponse(result, 'Backup created successfully', 201);
+  }
+
+  // Otherwise require Super Admin JWT
+
+const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { isSuperAdmin } = ctxResult.context;
+  if (!isSuperAdmin) {
+  return forbiddenResponse('Backup management is restricted to Super Admin');
+  }
+
+const result = await createBackup();
+  return successResponse(result, 'Backup created successfully', 201);
+});

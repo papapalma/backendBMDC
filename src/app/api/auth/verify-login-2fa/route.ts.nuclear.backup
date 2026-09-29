@@ -1,0 +1,303 @@
+﻿/**
+ * POST /api/auth/verify-login-2fa
+ *
+ * Verify 2FA OTP code during login (admin users).
+ *
+ * This endpoint is used during the login flow when 2FA is required for admin/staff users.
+ * The frontend receives a tempToken after successful email/password validation, then
+ * verifies the OTP sent via email to complete the login.
+ *
+ * Request body:
+ * {
+ *   "otp": "123456",
+ *   "tempToken": "eyJhbGc..."
+ * }
+ *
+ * Response on success:
+ * {
+ *   "success": true,
+ *   "token": "full-jwt-token",
+ *   "user": { id, username, email, role },
+ *   "message": "Login verified"
+ * }
+ *
+ * Error responses:
+ * - 400: Invalid OTP, invalid token, or validation error
+ * - 401: Token signature invalid or expired
+ * - 429: Too many attempts (locked out)
+ * - 500: Server error
+ *
+ * Rate limiting:
+ * - 5 attempts per 30 minutes per IP address
+ * - Retry-After header included in 429 responses
+ *
+ * Security:
+ * - Temporary token validates user identity and session
+ * - OTP code must match the temporary token's stored code
+ * - Both OTP and token must be valid and not expired
+ * - Invalid attempts logged to audit_logs
+ * - Full login token issued only after successful verification
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyLogin2FASchema } from '@/utils/validators';
+import { validateOTP, markOTPAsVerified } from '@/services/otpService';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/utils/logger';
+import { checkRateLimit, getRateLimitKey } from '@/utils/rateLimit';
+import { validationErrorResponse, successResponse, errorResponse, unauthorizedResponse } from '@/utils/responses';
+import jwt from 'jsonwebtoken';
+
+interface VerifyLogin2FARequest {
+  otp: string;
+  tempToken: string;
+}
+
+interface TempTokenPayload {
+  userId: string;
+  email: string;
+  type: string;
+  sessionId: string;
+  iat: number;
+  exp: number;
+}
+
+const TEMP_TOKEN_SECRET = process.env.TEMP_TOKEN_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret-change-in-production';
+const JWT_EXPIRY = '7d';
+const BCRYPT_COST_FACTOR = 12;
+
+/**
+ * POST handler: Verify login 2FA OTP code
+ */
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  try {
+  const body: VerifyLogin2FARequest = await request.json();
+
+  // ────────────────────────────────────────────────────────────────────
+  // STEP 1: Validate input schema
+  // ────────────────────────────────────────────────────────────────────
+
+  const validation = verifyLogin2FASchema.safeParse(body);
+  if (!validation.success) {
+  logger.warn('[LOGIN_2FA] Validation failed', {
+  errors: validation.error.flatten(),
+  });
+
+  return validationErrorResponse(
+  Object.fromEntries(
+  validation.error.errors.map((err) => [
+  err.path.join('.'),
+  [err.message],
+  ])
+  )
+  );
+  }
+
+const { otp, tempToken } = validation.data;
+
+  logger.info('[LOGIN_2FA] Starting login 2FA verification');
+
+  // ────────────────────────────────────────────────────────────────────
+  // STEP 2: Rate limiting check (per IP)
+  // ────────────────────────────────────────────────────────────────────
+
+  const clientIp = getRateLimitKey(request, 'login-2fa');
+  const rateLimitResponse = checkRateLimit(clientIp, {
+  limit: 5,
+  windowMs: 30 * 60 * 1000, // 30 minutes
+  });
+
+  if (rateLimitResponse) {
+  logger.warn('[LOGIN_2FA] Rate limit exceeded', { clientIp });
+  return rateLimitResponse as NextResponse;
+  }
+
+  // ────────────────────────────────────────────────────────────────────
+  // STEP 3: Verify temporary token
+  // ────────────────────────────────────────────────────────────────────
+
+  let tempPayload: TempTokenPayload;
+  try {
+  tempPayload = jwt.verify(tempToken, TEMP_TOKEN_SECRET) as TempTokenPayload;
+  } catch (tokenError: any) {
+  logger.warn('[LOGIN_2FA] Temporary token verification failed', {
+  error: tokenError?.message,
+  });
+
+  return unauthorizedResponse('Invalid or expired verification token. Please log in again.');
+  }
+  if (tempPayload.type !== 'login_2fa_temp') {
+  logger.warn('[LOGIN_2FA] Invalid token type', {
+  userId: tempPayload.userId,
+  tokenType: tempPayload.type,
+  });
+
+  return unauthorizedResponse('Invalid verification token.');
+  }
+
+const { userId, email } = tempPayload;
+  const normalizedEmail = email.toLowerCase().trim();
+
+  logger.info('[LOGIN_2FA] Temporary token verified', { userId, email: normalizedEmail });
+
+  // ────────────────────────────────────────────────────────────────────
+  // STEP 4: Validate OTP
+  // ────────────────────────────────────────────────────────────────────
+
+  const validationResult = await validateOTP(normalizedEmail, otp, '2fa');
+
+  if (!validationResult.valid) {
+  const remainingAttempts = validationResult.remainingAttempts ?? 0;
+
+  logger.warn('[LOGIN_2FA] OTP validation failed', {
+  userId,
+  email: normalizedEmail,
+  error: validationResult.error,
+  remainingAttempts,
+  });
+
+  // Log failed attempt to audit_logs
+  await supabaseAdmin.from('audit_logs').insert({
+  tenant_id: null,
+  user_id: userId,
+  action: 'login.2fa_failed',
+  entity_type: 'user',
+  entity_id: userId,
+  details: {
+  email: normalizedEmail,
+  reason: validationResult.error,
+  remainingAttempts,
+  ip: getRateLimitKey(request, ''),
+  },
+  }).catch((e) => logger.warn('[AUDIT] Failed to log 2FA attempt', { error: e }));
+
+  // Return 429 if locked out
+  if (remainingAttempts === 0) {
+  return NextResponse.json(
+  {
+  success: false,
+  error: 'Too many failed attempts. Please request a new verification code.',
+  locked: true,
+  },
+  { status: 429, headers: { 'Retry-After': '600' } }
+  );
+  }
+
+  return NextResponse.json(
+  {
+  success: false,
+  error: validationResult.error,
+  remainingAttempts,
+  },
+  { status: 400 }
+  );
+  }
+
+  // ────────────────────────────────────────────────────────────────────
+  // STEP 5: Fetch user details for JWT issuance
+  // ────────────────────────────────────────────────────────────────────
+
+  const { data: user, error: userError } = await supabaseAdmin
+  .from('users')
+  .select('id, username, email, role, tenant_id')
+  .eq('id', userId)
+  .single();
+
+  if (userError || !user) {
+  logger.error('[LOGIN_2FA] User not found during 2FA verification', {
+  userId,
+  error: userError?.message,
+  });
+
+  return errorResponse(
+  'User not found. Please log in again.',
+  500
+  );
+  }
+
+  // ────────────────────────────────────────────────────────────────────
+  // STEP 6: Generate JWT token
+  // ────────────────────────────────────────────────────────────────────
+
+  const jwtPayload = {
+  userId: user.id,
+  email: user.email,
+  username: user.username,
+  role: user.role,
+  tenantId: user.tenant_id || 'platform',
+  jti: `${user.id}-${Date.now()}`,
+  };
+
+  const token = jwt.sign(jwtPayload, JWT_SECRET, {
+  expiresIn: JWT_EXPIRY,
+  algorithm: 'HS256',
+  });
+
+  // ────────────────────────────────────────────────────────────────────
+  // STEP 7: Mark OTP as verified
+  // ────────────────────────────────────────────────────────────────────
+
+  if (validationResult.record?.id) {
+  try {
+  await markOTPAsVerified(validationResult.record.id);
+  } catch (markError) {
+  logger.warn('[LOGIN_2FA] Failed to mark OTP as verified', {
+  verificationId: validationResult.record.id,
+  error: markError,
+  });
+  // Don't fail the request - the verification is complete
+  }
+  }
+
+  // ────────────────────────────────────────────────────────────────────
+  // STEP 8: Log successful login
+  // ────────────────────────────────────────────────────────────────────
+
+  logger.info('[LOGIN_2FA] Login 2FA verification successful', {
+  userId: user.id,
+  email: normalizedEmail,
+  role: user.role,
+  });
+
+  await supabaseAdmin.from('audit_logs').insert({
+  tenant_id: user.tenant_id || null,
+  user_id: user.id,
+  action: 'login.success_with_2fa',
+  entity_type: 'user',
+  entity_id: user.id,
+  details: {
+  email: user.email,
+  username: user.username,
+  role: user.role,
+  ip: getRateLimitKey(request, ''),
+  timestamp: new Date().toISOString(),
+  },
+  }).catch((e) => logger.warn('[AUDIT] Failed to log successful login', { error: e }));
+
+  return successResponse(
+  {
+  token,
+  user: {
+  id: user.id,
+  username: user.username,
+  email: user.email,
+  role: user.role,
+  tenantId: user.tenant_id,
+  },
+  },
+  'Login verified successfully',
+  200
+  );
+  } catch (error: any) {
+  logger.error('[LOGIN_2FA] Unexpected error', {
+  error: error?.message,
+  stack: error?.stack,
+  });
+
+  return errorResponse(
+  'An unexpected error occurred. Please try again.',
+  500
+  );
+  }
+}

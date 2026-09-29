@@ -1,0 +1,180 @@
+npm notice run inventory-backend@1.0.0 build
+npm notice run next build
+Γû▓ Next.js 16.3.5 (Turbopack)
+- Environments: .env
+Γ£ô Running next.config.js took 11ms
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 1180ms
+  Running TypeScript ...
+  Finished TypeScript in 1340ms ...
+  Collecting page data using 19 workers ...
+  Generating static pages using 19 workers (0/103) ...
+  Generating static pages using 19 workers (25/103) 
+  Generating static pages using 19 workers (51/103) 
+  Generating static pages using 19 workers (77/103) 
+Γ£ô Generating static pages using 19 workers (103/103) in 159ms
+  Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ ╞Æ /api/activity-logs
+Γö£ ╞Æ /api/activity-logs/stats
+Γö£ ╞Æ /api/admin/accounts
+Γö£ ╞Æ /api/admin/audit-logs
+Γö£ ╞Æ /api/admin/backup
+Γö£ ╞Æ /api/admin/data-breach
+Γö£ ╞Æ /api/admin/extension-requests
+Γö£ ╞Æ /api/admin/extension-requests/[id]
+Γö£ ╞Æ /api/admin/feature-flags
+Γö£ ╞Æ /api/admin/feature-flags/[id]
+Γö£ ╞Æ /api/admin/file-cleanup
+Γö£ ╞Æ /api/admin/file-migration
+Γö£ ╞Æ /api/admin/migrate-cms
+Γö£ ╞Æ /api/admin/migrations/enrollment-requirements
+Γö£ ╞Æ /api/admin/performance
+Γö£ ╞Æ /api/admin/pilot
+Γö£ ╞Æ /api/admin/reports/cross-tenant-comparison
+Γö£ ╞Æ /api/admin/reports/platform-summary
+Γö£ ╞Æ /api/admin/tenants
+Γö£ ╞Æ /api/admin/tenants/[id]
+Γö£ ╞Æ /api/admin/tenants/[id]/deactivate
+Γö£ ╞Æ /api/admin/tenants/[id]/reactivate
+Γö£ ╞Æ /api/attendance
+Γö£ ╞Æ /api/attendance/me
+Γö£ ╞Æ /api/attendance/schedules
+Γö£ ╞Æ /api/attendance/schedules/[id]
+Γö£ ╞Æ /api/attendance/schedules/[id]/overrides
+Γö£ ╞Æ /api/attendance/schedules/[id]/overrides/[overrideId]
+Γö£ ╞Æ /api/attendance/submit
+Γö£ ╞Æ /api/auth/change-password
+Γö£ ╞Æ /api/auth/debug
+Γö£ ╞Æ /api/auth/debug-login
+Γö£ ╞Æ /api/auth/debug2
+Γö£ ╞Æ /api/auth/forgot-password
+Γö£ ╞Æ /api/auth/login
+Γö£ ╞Æ /api/auth/logout
+Γö£ ╞Æ /api/auth/me
+Γö£ ╞Æ /api/auth/password-reset-requests
+Γö£ ╞Æ /api/auth/password-reset-requests/[id]
+Γö£ ╞Æ /api/auth/refresh
+Γö£ ╞Æ /api/auth/register
+Γö£ ╞Æ /api/auth/reset-password
+Γö£ ╞Æ /api/auth/select-tenant
+Γö£ ╞Æ /api/auth/verify-2fa
+Γö£ ╞Æ /api/auth/verify-email-signup
+Γö£ ╞Æ /api/auth/verify-login-2fa
+Γö£ ╞Æ /api/auth/verify-password-reset-otp
+Γö£ ╞Æ /api/borrowing-slips
+Γö£ ╞Æ /api/borrowing-slips/[id]
+Γö£ ╞Æ /api/borrowing-slips/active
+Γö£ ╞Æ /api/borrowing-slips/by-number/[slipNumber]
+Γö£ ╞Æ /api/borrowing-slips/overdue
+Γö£ ╞Æ /api/borrowing-slips/stats
+Γö£ ╞Æ /api/certificates
+Γö£ ╞Æ /api/certificates/[id]
+Γö£ ╞Æ /api/certificates/templates
+Γö£ ╞Æ /api/certificates/templates/[id]
+Γö£ ╞Æ /api/certificates/verify/[identifier]
+Γö£ ╞Æ /api/enrollments
+Γö£ ╞Æ /api/enrollments/[id]
+Γö£ ╞Æ /api/extension-requests
+Γö£ ╞Æ /api/files/[...path]
+Γö£ ╞Æ /api/instructors
+Γö£ ╞Æ /api/instructors/[id]
+Γö£ ╞Æ /api/items
+Γö£ ╞Æ /api/items/[id]
+Γö£ ╞Æ /api/items/export
+Γö£ ╞Æ /api/items/scan
+Γö£ ╞Æ /api/items/stats
+Γö£ ╞Æ /api/landing-content
+Γö£ ╞Æ /api/lendings
+Γö£ ╞Æ /api/lendings/[id]
+Γö£ ╞Æ /api/lendings/[id]/return
+Γö£ ╞Æ /api/lendings/export
+Γö£ ╞Æ /api/lendings/overdue
+Γö£ ╞Æ /api/lendings/stats
+Γö£ ╞Æ /api/non-attendance-dates
+Γö£ ╞Æ /api/non-attendance-dates/[id]
+Γö£ ╞Æ /api/notifications
+Γö£ ╞Æ /api/privacy/notice
+Γö£ ╞Æ /api/programs
+Γö£ ╞Æ /api/programs/[id]
+Γö£ ╞Æ /api/programs/[id]/enroll
+Γö£ ╞Æ /api/programs/[id]/instructors
+Γö£ ╞Æ /api/programs/[id]/notify-trainees
+Γö£ ╞Æ /api/programs/[id]/share-link
+Γö£ ╞Æ /api/programs/[id]/stats
+Γö£ ╞Æ /api/programs/[id]/trainees
+Γö£ ╞Æ /api/programs/[id]/validate-share
+Γö£ ╞Æ /api/programs/[id]/verify-access
+Γö£ ╞Æ /api/programs/stats
+Γö£ ╞Æ /api/push-subscriptions
+Γö£ ╞Æ /api/push-subscriptions/[id]
+Γö£ ╞Æ /api/push-subscriptions/vapid
+Γö£ ╞Æ /api/registrations
+Γö£ ╞Æ /api/registrations/[id]
+Γö£ ╞Æ /api/registrations/me
+Γö£ ╞Æ /api/registrations/pending-count
+Γö£ ╞Æ /api/reports/[type]/csv
+Γö£ ╞Æ /api/reports/[type]/pdf
+Γö£ ╞Æ /api/reports/activity
+Γö£ ╞Æ /api/reports/attendance
+Γö£ ╞Æ /api/reports/comprehensive
+Γö£ ╞Æ /api/reports/dashboard
+Γö£ ╞Æ /api/reports/inventory
+Γö£ ╞Æ /api/reports/inventory-summary
+Γö£ ╞Æ /api/reports/lendings
+Γö£ ╞Æ /api/reports/programs
+Γö£ ╞Æ /api/reports/schedule
+Γö£ ╞Æ /api/reports/trainee-demographics
+Γö£ ╞Æ /api/reports/trainees
+Γö£ ╞Æ /api/reports/training-summary
+Γö£ ╞Æ /api/reports/users
+Γö£ ╞Æ /api/requirement-definitions
+Γö£ ╞Æ /api/requirement-definitions/[id]
+Γö£ ╞Æ /api/requirement-definitions/[id]/submissions
+Γö£ ╞Æ /api/requirements/analytics
+Γö£ ╞Æ /api/sessions
+Γö£ ╞Æ /api/sessions/[id]
+Γö£ ╞Æ /api/tenants
+Γö£ ╞Æ /api/tenants/[id]/configuration
+Γö£ ╞Æ /api/tenants/[id]/export
+Γö£ ╞Æ /api/theme-presets
+Γö£ ╞Æ /api/theme-presets/[id]/apply
+Γö£ ╞Æ /api/trainee-status
+Γö£ ╞Æ /api/trainees
+Γö£ ╞Æ /api/trainees/[id]
+Γö£ ╞Æ /api/trainees/[id]/anonymize
+Γö£ ╞Æ /api/trainees/[id]/certificates
+Γö£ ╞Æ /api/trainees/[id]/confirm-email-change
+Γö£ ╞Æ /api/trainees/[id]/notification-preferences
+Γö£ ╞Æ /api/trainees/[id]/personal-data
+Γö£ ╞Æ /api/trainees/[id]/request-email-change
+Γö£ ╞Æ /api/trainees/[id]/requirements
+Γö£ ╞Æ /api/trainees/[id]/requirements/[type]
+Γö£ ╞Æ /api/trainees/[id]/requirements/[type]/download
+Γö£ ╞Æ /api/trainees/[id]/restore
+Γö£ ╞Æ /api/trainees/export
+Γö£ ╞Æ /api/trainees/me
+Γö£ ╞Æ /api/trainees/me/certificates
+Γö£ ╞Æ /api/trainees/me/dashboard
+Γö£ ╞Æ /api/trainees/me/enrollments
+Γö£ ╞Æ /api/trainees/me/programs
+Γö£ ╞Æ /api/trainees/send-2fa
+Γö£ ╞Æ /api/trainees/stats
+Γö£ ╞Æ /api/upload
+Γö£ ╞Æ /api/upload/tenant
+Γö£ ╞Æ /api/users
+Γö£ ╞Æ /api/users/[id]
+Γö£ ╞Æ /api/verification/check-status
+Γö£ ╞Æ /api/verification/send-code
+Γöö ╞Æ /api/verification/verify-code
+
+
+╞Æ Proxy (Middleware)
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

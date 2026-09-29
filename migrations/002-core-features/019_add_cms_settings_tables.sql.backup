@@ -1,0 +1,716 @@
+-- =============================================================================
+-- 019_add_cms_settings_tables.sql
+-- Add CMS Settings tables for landing page customization system
+--
+-- This migration creates the database schema for the landing page customization
+-- system, enabling administrators to dynamically customize landing page styling,
+-- content, and component visibility without requiring code changes.
+--
+-- Tables created:
+--   1. cms_settings (main configuration store - one record per tenant)
+--   2. cms_settings_versions (version history for rollback capability)
+--   3. cms_audit_log (audit trail for compliance and troubleshooting)
+--   4. theme_presets (pre-configured theme templates)
+--
+-- Key Features:
+--   - Strict tenant isolation with UNIQUE constraint on tenant_id
+--   - JSONB structure for flexible customization storage
+--   - Version tracking for rollback functionality
+--   - Comprehensive audit logging
+--   - Foreign key constraints for referential integrity
+--   - Performance indexes for tenant-based queries
+--
+-- Migration Strategy:
+--   1. Create cms_settings table (main store)
+--   2. Create cms_settings_versions table (version history)
+--   3. Create cms_audit_log table (audit trail)
+--   4. Create theme_presets table (preset templates)
+--   5. Create indexes for performance optimization
+--   6. Add update triggers for timestamp management
+--   7. Migration is idempotent (safe to run multiple times)
+--
+-- Mapped Requirements:
+--   - Requirement 8.1: Database storage of customizations
+--   - Requirement 8.2: Metadata storage (created_at, updated_at, updated_by_admin_id)
+--   - Requirement 2.1: Tenant isolation with tenant_id foreign key
+--   - Requirement 13: Configuration versioning and rollback
+--   - Requirement 15: Customization audit trail
+-- =============================================================================
+
+BEGIN;
+
+-- =============================================================================
+-- 1. CMS SETTINGS TABLE (Main Configuration Store)
+-- =============================================================================
+
+-- Primary table storing the active customization configuration for each tenant
+-- One record per tenant with UNIQUE constraint on tenant_id
+CREATE TABLE IF NOT EXISTS cms_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL UNIQUE,
+  
+  -- JSONB structure containing all customization data
+  settings_data JSONB NOT NULL DEFAULT '{
+    "colors": {
+      "primary": "#3B82F6",
+      "secondary": "#10B981",
+      "accent": "#F59E0B",
+      "background": "#FFFFFF",
+      "text": "#1F2937",
+      "borders": "#E5E7EB"
+    },
+    "typography": {
+      "headings": {
+        "fontFamily": "Poppins",
+        "fontSize": {
+          "h1": 48,
+          "h2": 36,
+          "h3": 28
+        },
+        "fontWeight": 700,
+        "lineHeight": 1.2
+      },
+      "body": {
+        "fontFamily": "Inter",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "lineHeight": 1.5
+      }
+    },
+    "layout": {
+      "containerWidth": "1200px",
+      "containerLayout": "centered",
+      "padding": {
+        "heroSection": 40,
+        "contentAreas": 32,
+        "footer": 24
+      },
+      "margins": {
+        "sectionSpacing": 48,
+        "elementSpacing": 16
+      },
+      "gaps": {
+        "grid": 24,
+        "flex": 16
+      }
+    },
+    "components": {
+      "navigation": {
+        "enabled": true,
+        "style": "light"
+      },
+      "hero": {
+        "enabled": true,
+        "backgroundImage": "url(...)",
+        "overlayColor": "rgba(0,0,0,0.3)",
+        "height": "500px"
+      },
+      "features": {
+        "enabled": true,
+        "layout": "grid",
+        "columns": 3
+      },
+      "testimonials": {
+        "enabled": true,
+        "displayCount": 3
+      },
+      "ctaSection": {
+        "enabled": true,
+        "style": "button"
+      },
+      "contact": {
+        "enabled": true,
+        "formFields": ["email", "phone", "message"]
+      },
+      "footer": {
+        "enabled": true,
+        "linkColumns": 4
+      }
+    },
+    "content": {
+      "hero": {
+        "heading": "Welcome to Our Platform",
+        "subheading": "Build amazing things",
+        "ctaText": "Get Started"
+      },
+      "missionVision": {
+        "title": "Our Mission",
+        "description": "To empower businesses...",
+        "vision": "To be the leading..."
+      },
+      "features": [
+        {
+          "title": "Feature 1",
+          "description": "Description...",
+          "icon": "icon-name"
+        }
+      ],
+      "testimonials": [
+        {
+          "text": "Great product!",
+          "author": "John Doe",
+          "image": "url(...)"
+        }
+      ],
+      "contact": {
+        "email": "contact@example.com",
+        "phone": "+1-555-000-0000",
+        "address": "123 Main St",
+        "socialLinks": {
+          "twitter": "https://twitter.com/...",
+          "linkedin": "https://linkedin.com/..."
+        }
+      }
+    }
+  }',
+  
+  -- Metadata columns
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_by_admin_id UUID,
+  
+  -- Foreign key constraints
+  CONSTRAINT fk_cms_settings_tenant FOREIGN KEY (tenant_id) 
+    REFERENCES tenants(id) ON DELETE CASCADE,
+  CONSTRAINT fk_cms_settings_admin FOREIGN KEY (updated_by_admin_id) 
+    REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Index for fast tenant lookups (Requirement 2 - Tenant Isolation)
+CREATE INDEX IF NOT EXISTS idx_cms_settings_tenant_id 
+  ON cms_settings(tenant_id);
+
+-- Trigger to automatically update updated_at timestamp on modification
+DROP TRIGGER IF EXISTS trigger_cms_settings_updated_at ON cms_settings;
+CREATE TRIGGER trigger_cms_settings_updated_at
+  BEFORE UPDATE ON cms_settings
+  FOR EACH ROW
+  EXECUTE FUNCTION trigger_set_updated_at();
+
+
+-- =============================================================================
+-- 2. CMS SETTINGS VERSIONS TABLE (Version History for Rollback)
+-- =============================================================================
+
+-- Tracks configuration history for rollback and versioning (Requirement 13)
+CREATE TABLE IF NOT EXISTS cms_settings_versions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  cms_settings_id UUID NOT NULL,
+  tenant_id UUID NOT NULL,
+  
+  -- Snapshot of the configuration at this version
+  settings_data JSONB NOT NULL,
+  
+  -- Version tracking
+  version_number INTEGER NOT NULL,
+  change_summary VARCHAR(255),
+  
+  -- Metadata
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_by_admin_id UUID,
+  
+  -- Foreign key constraints
+  CONSTRAINT fk_cms_versions_cms_settings FOREIGN KEY (cms_settings_id) 
+    REFERENCES cms_settings(id) ON DELETE CASCADE,
+  CONSTRAINT fk_cms_versions_tenant FOREIGN KEY (tenant_id) 
+    REFERENCES tenants(id) ON DELETE CASCADE,
+  CONSTRAINT fk_cms_versions_admin FOREIGN KEY (created_by_admin_id) 
+    REFERENCES users(id) ON DELETE SET NULL,
+  
+  -- Unique constraint to prevent duplicate versions
+  CONSTRAINT unique_cms_version UNIQUE(cms_settings_id, version_number)
+);
+
+-- Indexes for efficient version queries
+CREATE INDEX IF NOT EXISTS idx_cms_versions_tenant_id 
+  ON cms_settings_versions(tenant_id);
+
+CREATE INDEX IF NOT EXISTS idx_cms_versions_cms_settings_id 
+  ON cms_settings_versions(cms_settings_id);
+
+CREATE INDEX IF NOT EXISTS idx_cms_versions_created_at 
+  ON cms_settings_versions(created_at DESC);
+
+
+-- =============================================================================
+-- 3. CMS AUDIT LOG TABLE (Audit Trail for Compliance)
+-- =============================================================================
+
+-- Tracks all customization changes for compliance and troubleshooting (Requirement 15)
+CREATE TABLE IF NOT EXISTS cms_audit_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  admin_id UUID,
+  
+  -- Action type: create, update, delete, import, rollback, apply_preset, export
+  action VARCHAR(50) NOT NULL
+    CHECK (action IN ('create', 'update', 'delete', 'import', 'rollback', 'apply_preset', 'export')),
+  
+  -- Resource type: cms_settings, theme_preset, etc.
+  resource_type VARCHAR(50),
+  
+  -- Resource ID for the affected resource
+  resource_id UUID,
+  
+  -- JSON object containing what changed
+  -- Example: {"colors": {"primary": {"old": "#3B82F6", "new": "#FF0000"}}}
+  changes JSONB,
+  
+  -- Optional error message if operation failed
+  error_message TEXT,
+  
+  -- Optional IP address for tracking
+  ip_address VARCHAR(45),
+  
+  -- Optional user agent string
+  user_agent VARCHAR(255),
+  
+  -- Timestamp of the change
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  
+  -- Foreign key constraints
+  CONSTRAINT fk_cms_audit_tenant FOREIGN KEY (tenant_id) 
+    REFERENCES tenants(id) ON DELETE CASCADE,
+  CONSTRAINT fk_cms_audit_admin FOREIGN KEY (admin_id) 
+    REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Indexes for efficient audit log queries (Requirement 15.2, 2.10)
+CREATE INDEX IF NOT EXISTS idx_cms_audit_tenant_id 
+  ON cms_audit_log(tenant_id);
+
+CREATE INDEX IF NOT EXISTS idx_cms_audit_admin_id 
+  ON cms_audit_log(admin_id);
+
+CREATE INDEX IF NOT EXISTS idx_cms_audit_timestamp 
+  ON cms_audit_log(timestamp DESC);
+
+CREATE INDEX IF NOT EXISTS idx_cms_audit_action 
+  ON cms_audit_log(action);
+
+-- Composite index for efficient tenant-scoped range queries (Requirement 15.2, 2.10)
+CREATE INDEX IF NOT EXISTS idx_cms_audit_tenant_timestamp 
+  ON cms_audit_log(tenant_id, timestamp DESC);
+
+
+-- =============================================================================
+-- 4. THEME PRESETS TABLE (Pre-Configured Theme Templates)
+-- =============================================================================
+
+-- Pre-configured theme templates for quick setup (Requirement 10)
+-- These are global presets, each tenant applies their own copy
+CREATE TABLE IF NOT EXISTS theme_presets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  
+  -- Preset metadata
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  category VARCHAR(100), -- e.g., "modern", "corporate", "creative", "bold", "startup", "luxury"
+  
+  -- Preset configuration data (same structure as cms_settings.settings_data)
+  preset_data JSONB NOT NULL,
+  
+  -- Enable/disable preset availability (Requirement 10.2)
+  is_active BOOLEAN DEFAULT true,
+  
+  -- Metadata
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  
+  -- Ensure preset names are unique (Requirement 10.2)
+  CONSTRAINT unique_preset_name UNIQUE(name)
+);
+
+-- Index for efficient preset queries by active status (Requirement 10.2)
+CREATE INDEX IF NOT EXISTS idx_theme_presets_is_active 
+  ON theme_presets(is_active);
+
+-- Index for filtering by category (Requirement 10.2)
+CREATE INDEX IF NOT EXISTS idx_theme_presets_category 
+  ON theme_presets(category);
+
+CREATE INDEX IF NOT EXISTS idx_theme_presets_created_at 
+  ON theme_presets(created_at DESC);
+
+-- Trigger to automatically update updated_at timestamp on modification
+DROP TRIGGER IF EXISTS trigger_theme_presets_updated_at ON theme_presets;
+CREATE TRIGGER trigger_theme_presets_updated_at
+  BEFORE UPDATE ON theme_presets
+  FOR EACH ROW
+  EXECUTE FUNCTION trigger_set_updated_at();
+
+
+-- =============================================================================
+-- 4.1 POPULATE DEFAULT THEME PRESETS (Requirement 10.1, 10.2)
+-- =============================================================================
+
+-- Insert default theme presets if they don't already exist
+-- These 6 presets provide diverse design styles for different business types
+
+INSERT INTO theme_presets (name, description, category, preset_data, is_active)
+VALUES
+  -- Modern Minimal: Clean, contemporary design with ample whitespace
+  ('Modern Minimal', 'Clean and contemporary design with minimalist aesthetic, ample whitespace, and modern typography', 'modern', '{
+    "colors": {
+      "primary": "#1F2937",
+      "secondary": "#F3F4F6",
+      "accent": "#3B82F6",
+      "background": "#FFFFFF",
+      "text": "#111827",
+      "borders": "#E5E7EB"
+    },
+    "typography": {
+      "headings": {
+        "fontFamily": "Poppins",
+        "fontSize": {"h1": 48, "h2": 36, "h3": 28},
+        "fontWeight": 700,
+        "lineHeight": 1.2
+      },
+      "body": {
+        "fontFamily": "Inter",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "lineHeight": 1.6
+      }
+    },
+    "layout": {
+      "containerWidth": "1200px",
+      "containerLayout": "centered",
+      "padding": {"heroSection": 60, "contentAreas": 40, "footer": 40},
+      "margins": {"sectionSpacing": 60, "elementSpacing": 20},
+      "gaps": {"grid": 24, "flex": 16}
+    },
+    "components": {
+      "navigation": {"enabled": true, "style": "minimal"},
+      "hero": {"enabled": true, "height": "600px", "overlayColor": "rgba(0,0,0,0)"},
+      "features": {"enabled": true, "layout": "grid", "columns": 3},
+      "testimonials": {"enabled": true, "displayCount": 3},
+      "ctaSection": {"enabled": true, "style": "button"},
+      "contact": {"enabled": true, "formFields": ["email", "message"]},
+      "footer": {"enabled": true, "linkColumns": 4}
+    },
+    "content": {
+      "hero": {"heading": "Minimal Design, Maximum Impact", "subheading": "Build with clarity and purpose", "ctaText": "Get Started"},
+      "missionVision": {"title": "Our Mission", "description": "Creating elegant, simple solutions", "vision": "To define minimalism in tech"},
+      "features": [{"title": "Feature 1", "description": "Clean and simple"}, {"title": "Feature 2", "description": "Focused and minimal"}, {"title": "Feature 3", "description": "Pure and elegant"}],
+      "testimonials": [{"text": "Beautifully simple", "author": "Design Lead"}],
+      "contact": {"email": "hello@company.com", "phone": "+1-555-000-0000", "address": "123 Modern Ave"}
+    }
+  }', true),
+
+  -- Corporate: Professional and trustworthy design for enterprises
+  ('Corporate', 'Professional corporate design with strong typography, authoritative colors, and structured layout for enterprise clients', 'corporate', '{
+    "colors": {
+      "primary": "#003A70",
+      "secondary": "#0052A3",
+      "accent": "#F39200",
+      "background": "#FFFFFF",
+      "text": "#1A1A1A",
+      "borders": "#D0D0D0"
+    },
+    "typography": {
+      "headings": {
+        "fontFamily": "Roboto",
+        "fontSize": {"h1": 44, "h2": 32, "h3": 24},
+        "fontWeight": 600,
+        "lineHeight": 1.3
+      },
+      "body": {
+        "fontFamily": "Open Sans",
+        "fontSize": 15,
+        "fontWeight": 400,
+        "lineHeight": 1.5
+      }
+    },
+    "layout": {
+      "containerWidth": "1280px",
+      "containerLayout": "centered",
+      "padding": {"heroSection": 80, "contentAreas": 60, "footer": 60},
+      "margins": {"sectionSpacing": 80, "elementSpacing": 24},
+      "gaps": {"grid": 32, "flex": 16}
+    },
+    "components": {
+      "navigation": {"enabled": true, "style": "corporate"},
+      "hero": {"enabled": true, "height": "500px", "overlayColor": "rgba(0,58,112,0.3)"},
+      "features": {"enabled": true, "layout": "grid", "columns": 4},
+      "testimonials": {"enabled": true, "displayCount": 4},
+      "ctaSection": {"enabled": true, "style": "button"},
+      "contact": {"enabled": true, "formFields": ["email", "phone", "message"]},
+      "footer": {"enabled": true, "linkColumns": 5}
+    },
+    "content": {
+      "hero": {"heading": "Enterprise Solutions for Growth", "subheading": "Professional services that deliver results", "ctaText": "Contact Sales"},
+      "missionVision": {"title": "Our Corporate Vision", "description": "Leading enterprise transformation", "vision": "To be the trusted partner for businesses"},
+      "features": [{"title": "Reliability", "description": "99.9% uptime"}, {"title": "Security", "description": "Enterprise-grade"}, {"title": "Support", "description": "24/7 dedicated"}, {"title": "Compliance", "description": "ISO certified"}],
+      "testimonials": [{"text": "Excellent corporate partner", "author": "CEO, Fortune 500"}],
+      "contact": {"email": "corporate@company.com", "phone": "+1-800-COMPANY", "address": "456 Business Blvd, Suite 1000"}
+    }
+  }', true),
+
+  -- Creative: Vibrant and artistic design for creative agencies
+  ('Creative', 'Vibrant and artistic design with bold colors, dynamic typography, and creative layouts for agencies and studios', 'creative', '{
+    "colors": {
+      "primary": "#FF006E",
+      "secondary": "#8338EC",
+      "accent": "#FFBE0B",
+      "background": "#FFFFFF",
+      "text": "#17171B",
+      "borders": "#E5E5EA"
+    },
+    "typography": {
+      "headings": {
+        "fontFamily": "Playfair Display",
+        "fontSize": {"h1": 56, "h2": 42, "h3": 32},
+        "fontWeight": 700,
+        "lineHeight": 1.1
+      },
+      "body": {
+        "fontFamily": "Montserrat",
+        "fontSize": 16,
+        "fontWeight": 500,
+        "lineHeight": 1.6
+      }
+    },
+    "layout": {
+      "containerWidth": "1400px",
+      "containerLayout": "full-width",
+      "padding": {"heroSection": 40, "contentAreas": 60, "footer": 50},
+      "margins": {"sectionSpacing": 100, "elementSpacing": 24},
+      "gaps": {"grid": 28, "flex": 20}
+    },
+    "components": {
+      "navigation": {"enabled": true, "style": "creative"},
+      "hero": {"enabled": true, "height": "700px", "overlayColor": "rgba(255,0,110,0.1)"},
+      "features": {"enabled": true, "layout": "masonry", "columns": 3},
+      "testimonials": {"enabled": true, "displayCount": 5},
+      "ctaSection": {"enabled": true, "style": "gradient"},
+      "contact": {"enabled": true, "formFields": ["email", "message"]},
+      "footer": {"enabled": true, "linkColumns": 4}
+    },
+    "content": {
+      "hero": {"heading": "Create Extraordinary Experiences", "subheading": "Bold ideas brought to life", "ctaText": "Start Creating"},
+      "missionVision": {"title": "Our Creative Mission", "description": "Pushing boundaries of design", "vision": "To inspire creative excellence"},
+      "features": [{"title": "Bold Design", "description": "Creative expression"}, {"title": "Innovation", "description": "Next-gen ideas"}, {"title": "Passion", "description": "We care deeply"}],
+      "testimonials": [{"text": "Absolutely creative", "author": "Design Director"}],
+      "contact": {"email": "hello@creative.studio", "phone": "+1-555-CREATE-1", "address": "789 Studio Lane"}
+    }
+  }', true),
+
+  -- Bold Tech: Modern tech-focused design with bold colors
+  ('Bold Tech', 'Modern tech-focused design with bold gradients, vibrant colors, and cutting-edge typography for tech companies', 'bold', '{
+    "colors": {
+      "primary": "#6366F1",
+      "secondary": "#EC4899",
+      "accent": "#10B981",
+      "background": "#0F172A",
+      "text": "#F1F5F9",
+      "borders": "#1E293B"
+    },
+    "typography": {
+      "headings": {
+        "fontFamily": "Space Grotesk",
+        "fontSize": {"h1": 52, "h2": 40, "h3": 30},
+        "fontWeight": 700,
+        "lineHeight": 1.2
+      },
+      "body": {
+        "fontFamily": "JetBrains Mono",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "lineHeight": 1.6
+      }
+    },
+    "layout": {
+      "containerWidth": "1280px",
+      "containerLayout": "centered",
+      "padding": {"heroSection": 100, "contentAreas": 60, "footer": 60},
+      "margins": {"sectionSpacing": 80, "elementSpacing": 24},
+      "gaps": {"grid": 24, "flex": 12}
+    },
+    "components": {
+      "navigation": {"enabled": true, "style": "tech"},
+      "hero": {"enabled": true, "height": "600px", "overlayColor": "rgba(99,102,241,0.2)"},
+      "features": {"enabled": true, "layout": "grid", "columns": 3},
+      "testimonials": {"enabled": true, "displayCount": 3},
+      "ctaSection": {"enabled": true, "style": "button"},
+      "contact": {"enabled": true, "formFields": ["email", "message"]},
+      "footer": {"enabled": true, "linkColumns": 4}
+    },
+    "content": {
+      "hero": {"heading": "The Future is Now", "subheading": "Next-generation technology platform", "ctaText": "Try Now"},
+      "missionVision": {"title": "Tech Mission", "description": "Revolutionizing with technology", "vision": "To lead tech innovation"},
+      "features": [{"title": "AI-Powered", "description": "Smart algorithms"}, {"title": "Cloud Native", "description": "Scalable infrastructure"}, {"title": "Real-time", "description": "Instant updates"}],
+      "testimonials": [{"text": "Cutting-edge technology", "author": "Tech Lead"}],
+      "contact": {"email": "devs@techcompany.io", "phone": "+1-555-TECH-101", "address": "1000 Silicon Valley"}
+    }
+  }', true),
+
+  -- Startup: Fresh and energetic design for startups
+  ('Startup', 'Fresh and energetic design with vibrant colors, modern layout, and startup-friendly messaging for new ventures', 'startup', '{
+    "colors": {
+      "primary": "#FF5733",
+      "secondary": "#00D9FF",
+      "accent": "#00FF88",
+      "background": "#FFFFFF",
+      "text": "#1A1A2E",
+      "borders": "#E0E0E0"
+    },
+    "typography": {
+      "headings": {
+        "fontFamily": "Sohne",
+        "fontSize": {"h1": 50, "h2": 38, "h3": 28},
+        "fontWeight": 600,
+        "lineHeight": 1.2
+      },
+      "body": {
+        "fontFamily": "Inter",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "lineHeight": 1.6
+      }
+    },
+    "layout": {
+      "containerWidth": "1200px",
+      "containerLayout": "centered",
+      "padding": {"heroSection": 60, "contentAreas": 50, "footer": 50},
+      "margins": {"sectionSpacing": 80, "elementSpacing": 24},
+      "gaps": {"grid": 24, "flex": 16}
+    },
+    "components": {
+      "navigation": {"enabled": true, "style": "modern"},
+      "hero": {"enabled": true, "height": "550px", "overlayColor": "rgba(255,87,51,0.15)"},
+      "features": {"enabled": true, "layout": "grid", "columns": 3},
+      "testimonials": {"enabled": true, "displayCount": 3},
+      "ctaSection": {"enabled": true, "style": "button"},
+      "contact": {"enabled": true, "formFields": ["email", "message"]},
+      "footer": {"enabled": true, "linkColumns": 4}
+    },
+    "content": {
+      "hero": {"heading": "Join the Movement", "subheading": "Build something amazing with us", "ctaText": "Get Started Free"},
+      "missionVision": {"title": "Our Startup Vision", "description": "Disrupting industries through innovation", "vision": "To empower entrepreneurs"},
+      "features": [{"title": "Fast", "description": "Quick setup"}, {"title": "Flexible", "description": "Adapt as you grow"}, {"title": "Fun", "description": "Enjoy the journey"}],
+      "testimonials": [{"text": "Perfect for startups", "author": "Founder & CEO"}],
+      "contact": {"email": "hello@startup.co", "phone": "+1-555-STARTUP", "address": "123 Innovation Hub"}
+    }
+  }', true),
+
+  -- Luxury: Sophisticated design with premium aesthetics
+  ('Luxury', 'Sophisticated and elegant design with premium aesthetics, refined typography, and luxury brand positioning', 'luxury', '{
+    "colors": {
+      "primary": "#2D1810",
+      "secondary": "#B8860B",
+      "accent": "#D4AF37",
+      "background": "#FEFEF0",
+      "text": "#1F1F1F",
+      "borders": "#E8E8DC"
+    },
+    "typography": {
+      "headings": {
+        "fontFamily": "Didot",
+        "fontSize": {"h1": 54, "h2": 40, "h3": 32},
+        "fontWeight": 400,
+        "lineHeight": 1.1
+      },
+      "body": {
+        "fontFamily": "Cormorant",
+        "fontSize": 17,
+        "fontWeight": 300,
+        "lineHeight": 1.8
+      }
+    },
+    "layout": {
+      "containerWidth": "1100px",
+      "containerLayout": "centered",
+      "padding": {"heroSection": 100, "contentAreas": 80, "footer": 60},
+      "margins": {"sectionSpacing": 120, "elementSpacing": 32},
+      "gaps": {"grid": 40, "flex": 24}
+    },
+    "components": {
+      "navigation": {"enabled": true, "style": "luxury"},
+      "hero": {"enabled": true, "height": "700px", "overlayColor": "rgba(45,24,16,0.2)"},
+      "features": {"enabled": true, "layout": "grid", "columns": 3},
+      "testimonials": {"enabled": true, "displayCount": 2},
+      "ctaSection": {"enabled": true, "style": "text"},
+      "contact": {"enabled": true, "formFields": ["email", "phone"]},
+      "footer": {"enabled": true, "linkColumns": 5}
+    },
+    "content": {
+      "hero": {"heading": "Exquisite Excellence", "subheading": "Premium experience redefined", "ctaText": "Discover More"},
+      "missionVision": {"title": "Our Heritage", "description": "Crafted for those who appreciate luxury", "vision": "To be the pinnacle of elegance"},
+      "features": [{"title": "Prestige", "description": "Uncompromising quality"}, {"title": "Exclusivity", "description": "Select few only"}, {"title": "Heritage", "description": "Timeless elegance"}],
+      "testimonials": [{"text": "Truly luxurious", "author": "Luxury Connoisseur"}],
+      "contact": {"email": "concierge@luxury.co", "phone": "+1-555-LUXURY-1", "address": "5th Avenue, New York, NY"}
+    }
+  }', true)
+ON CONFLICT (name) DO NOTHING;
+
+
+-- =============================================================================
+-- 5. FUNCTION: Populate initial cms_settings for existing tenants
+-- =============================================================================
+
+-- Helper function to initialize cms_settings for existing tenants
+-- This allows the migration to be run on existing databases with data
+CREATE OR REPLACE FUNCTION initialize_cms_settings_for_existing_tenants()
+RETURNS void AS $$
+BEGIN
+  -- Insert cms_settings records for any tenants that don't already have one
+  INSERT INTO cms_settings (tenant_id)
+  SELECT id FROM tenants
+  WHERE id NOT IN (SELECT tenant_id FROM cms_settings)
+  ON CONFLICT (tenant_id) DO NOTHING;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Call the function to ensure all existing tenants have cms_settings records
+SELECT initialize_cms_settings_for_existing_tenants();
+
+
+-- =============================================================================
+-- 6. VERIFICATION: Check that all tables and constraints are created
+-- =============================================================================
+
+-- Verify cms_audit_log table exists with required columns
+DO $$
+BEGIN
+  ASSERT EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_name = 'cms_audit_log'
+  ), 'cms_audit_log table not found';
+  
+  ASSERT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'cms_audit_log' AND column_name = 'tenant_id'
+  ), 'cms_audit_log missing tenant_id column';
+  
+  RAISE NOTICE 'Verification: cms_audit_log table created successfully';
+END $$;
+
+-- Verify theme_presets table exists with required columns
+DO $$
+BEGIN
+  ASSERT EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_name = 'theme_presets'
+  ), 'theme_presets table not found';
+  
+  ASSERT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'theme_presets' AND column_name = 'is_active'
+  ), 'theme_presets missing is_active column';
+  
+  RAISE NOTICE 'Verification: theme_presets table created successfully';
+END $$;
+
+-- Verify default presets are populated
+DO $$
+DECLARE
+  preset_count INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO preset_count FROM theme_presets WHERE is_active = true;
+  
+  ASSERT preset_count >= 6, 
+    'Expected at least 6 active default presets, found ' || preset_count;
+  
+  RAISE NOTICE 'Verification: % active theme presets loaded successfully', preset_count;
+END $$;

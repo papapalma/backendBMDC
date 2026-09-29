@@ -1,0 +1,81 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { comparePassword, hashPassword } from '@/lib/auth';
+import { requireAuthAsync } from '@/middleware/auth';
+import { successResponse, errorResponse, unauthorizedResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { activityLogService } from '@/services/activityLogService';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { z } from 'zod';
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z
+    .string()
+    .min(6, 'New password must be at least 6 characters')
+    .max(100, 'New password must not exceed 100 characters')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
+      'New password must contain at least one uppercase letter, one lowercase letter, and one number'
+    ),
+});
+
+// OPTIONS /api/auth/change-password - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// POST /api/auth/change-password
+
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const body = await request.json();
+  const parsed = changePasswordSchema.safeParse(body);
+  if (!parsed.success) {
+    return errorResponse(parsed.error.errors[0].message, 400);
+  }
+
+const { currentPassword, newPassword } = parsed.data;
+
+  // Fetch user with password hash
+
+const { data: user, error: fetchError } = await supabaseAdmin
+    .from('users')
+    .select('id, password_hash')
+    .eq('id', authResult.user.userId)
+    .single();
+
+  if (fetchError || !user) {
+    return errorResponse('User not found', 404);
+  }
+
+  // Verify current password
+
+const isValid = await comparePassword(currentPassword, user.password_hash);
+  if (!isValid) {
+    return unauthorizedResponse('Current password is incorrect');
+  }
+
+  // Hash new password and update
+
+const newHash = await hashPassword(newPassword);
+  const { error: updateError } = await supabaseAdmin
+    .from('users')
+    .update({ password_hash: newHash })
+    .eq('id', user.id);
+
+  if (updateError) throw updateError;
+
+  await activityLogService.logAction(
+    authResult.user.userId,
+    'update',
+    'user',
+    authResult.user.userId,
+    { action: 'change_password' }
+  );
+
+  return successResponse(null, 'Password changed successfully');
+});

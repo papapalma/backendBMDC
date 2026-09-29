@@ -1,0 +1,61 @@
+﻿/** * GET /api/admin/audit-logs * * Audit log query interface (Req 3.9, 21.14). * * Access rules: *  - Super Admin: can query audit logs across ALL tenants *  - Local Admin: can only query audit logs for their own tenant * * Supports filtering by: *  - tenant_id (Super Admin only) *  - user_id *  - action (exact match or prefix, e.g. 'auth.' matches all auth events) *  - entity_type *  - date range (start_date, end_date) *  - category (auth | authz | data | config | security) * * Supports pagination via limit + offset. * * Requirements: 3.9, 21.14 */import { NextRequest, NextResponse } from 'next/server';
+
+import { requireTenantContext } from '@/middleware/tenantContext';
+
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+
+import { withErrorHandler } from '@/middleware/errorHandler';
+
+import { handleOptionsRequest } from '@/middleware/cors';
+
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+import { logDataAccess, AuditAction } from '@/lib/auditLog';
+
+// OPTIONS /api/admin/audit-logsexport async function OPTIONS(request: NextRequest) { return handleOptionsRequest(request);}// GET /api/admin/audit-logs — query audit logs with filtering and paginationexport const GET = withErrorHandler(async (request: NextRequest) => { const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId, role, isSuperAdmin } = ctxResult.context;
+
+  // Only Super Admin and Local Admin can access audit logs (Req 3.9)  const allowedRoles = ['local_admin', 'super_admin'];
+  if (!allowedRoles.includes(role) && !isSuperAdmin) { return forbiddenResponse('Audit log access is restricted to administrators');
+}
+  const { searchParams } = new URL(request.url);
+
+  // Pagination (Req 21.14)  const limit  = Math.min(parseInt(searchParams.get('limit')  ?? '50',  10), 200);
+
+  const offset = Math.max(parseInt(searchParams.get('offset') ?? '0',  10), 0);
+
+  // Filters  const filterUserId  = searchParams.get('user_id')  || undefined;
+
+  const filterAction  = searchParams.get('action')  || undefined;
+
+  const filterCategory  = searchParams.get('category')  || undefined;
+
+  const filterEntityType = searchParams.get('entity_type') || undefined;
+
+  const filterEntityId  = searchParams.get('entity_id')  || undefined;
+
+  const filterStartDate  = searchParams.get('start_date')  || undefined;
+
+  const filterEndDate  = searchParams.get('end_date')  || undefined;
+
+  // Super Admin can filter by any tenant_id; Local Admin is locked to their own  const filterTenantId = isSuperAdmin  ? (searchParams.get('tenant_id') || undefined)  : tenantId;
+
+  // ── Build query ──────────────────────────────────────────────────────────  let query = supabaseAdmin  .from('audit_logs')  .select(`  id,  tenant_id,  user_id,  action,  entity_type,  entity_id,  details,  ip_address,  user_agent,  created_at,  user:users(id, email, username, role)  `, { count: 'exact' });
+
+  // Tenant scoping (Req 3.9 — Local Admin sees only their tenant)  if (filterTenantId) { query = query.eq('tenant_id', filterTenantId);  } else if (!isSuperAdmin) {  // Non-super-admin without explicit tenant filter: lock to own tenant  query = query.eq('tenant_id', tenantId);  }
+  if (filterUserId)  query = query.eq('user_id', filterUserId);
+  if (filterEntityType) query = query.eq('entity_type', filterEntityType);
+  if (filterEntityId)  query = query.eq('entity_id', filterEntityId);
+  if (filterStartDate)  query = query.gte('created_at', filterStartDate);
+  if (filterEndDate)  query = query.lte('created_at', filterEndDate);
+
+  // Action filter: exact match or category prefix (e.g. 'auth.' → all auth events)  if (filterAction) { if (filterAction.endsWith('.')) { query = query.like('action', `${filterAction}%`);  } else { query = query.eq('action', filterAction);  }  }
+
+// Category shorthand: maps to action prefix  if (filterCategory && !filterAction) { query = query.like('action', `${filterCategory}.%`);  }  // Pagination  query = query  .order('created_at', { ascending: false })  .range(offset, offset + limit - 1);
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  // Log this data access event (Req 21.10)  await logDataAccess({ action: AuditAction.DATA_READ_SENSITIVE,  userId,  tenantId,  entityType: 'audit_log',  details: { filters: { filterTenantId, filterUserId, filterAction, filterCategory, filterEntityType },  pagination: { limit, offset },  },  });  return successResponse({ data: data ?? [],  pagination: { total: count ?? 0,  limit,  offset,  hasMore: (count ?? 0) > offset + limit,  },  });});

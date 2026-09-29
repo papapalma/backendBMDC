@@ -1,0 +1,136 @@
+/**
+ * POST /api/trainees/send-2fa
+ *
+ * Send a 2FA verification code to a newly created trainee's email.
+ *
+ * This endpoint is called after a trainee is created with is_verified=false.
+ * It generates and sends a 2FA OTP code that the trainee must enter to complete
+ * account setup.
+ *
+ * Request body:
+ * {
+ *   "traineeId": "uuid",
+ *   "email": "trainee@example.com"
+ * }
+ *
+ * Response:
+ * {
+ *   "success": true,
+ *   "message": "2FA code sent to email",
+ *   "expiresIn": 900
+ * }
+ *
+ * Error responses:
+ * - 400: Invalid trainee or email
+ * - 404: Trainee not found
+ * - 500: Failed to send email
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createOTPVerification } from '@/services/otpService';
+import { send2FAOtpEmail } from '@/services/emailService';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/utils/logger';
+
+interface Send2FARequest {
+  traineeId: string;
+  email: string;
+}
+
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  try {
+    const body: Send2FARequest = await request.json();
+    const { traineeId, email } = body;
+
+    // Validate input
+    if (!traineeId || !email) {
+      return NextResponse.json(
+        { error: 'traineeId and email are required' },
+        { status: 400 }
+      );
+    }
+
+    logger.info('[2FA] Sending 2FA code', { traineeId, email });
+
+    // Verify trainee exists and email matches
+    const { data: trainee, error: traineeError } = await supabaseAdmin
+      .from('trainees')
+      .select('id, first_name, tenant_id, email')
+      .eq('id', traineeId)
+      .single();
+
+    if (traineeError || !trainee) {
+      logger.warn('[2FA] Trainee not found', { traineeId, error: traineeError });
+      return NextResponse.json(
+        { error: 'Trainee not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify email matches
+    if (trainee.email !== email) {
+      logger.warn('[2FA] Email mismatch', { traineeId, providedEmail: email, storedEmail: trainee.email });
+      return NextResponse.json(
+        { error: 'Email does not match trainee record' },
+        { status: 400 }
+      );
+    }
+
+    // Generate OTP
+    const otpResponse = await createOTPVerification({
+      email,
+      type: '2fa',
+      traineeId,
+      expiryMinutes: 15,
+      maxAttempts: 5,
+    });
+
+    logger.debug('[2FA] OTP generated', { traineeId, verificationId: otpResponse.verificationId });
+
+    // Send email
+    const emailResult = await send2FAOtpEmail({
+      tenantId: trainee.tenant_id,
+      recipientEmail: email,
+      traineeName: trainee.first_name,
+      otpCode: otpResponse.code,
+    });
+
+    if (!emailResult.success) {
+      logger.error('[2FA] Failed to send email', { traineeId, error: emailResult.error });
+      return NextResponse.json(
+        { error: 'Failed to send verification email' },
+        { status: 500 }
+      );
+    }
+
+    logger.info('[2FA] 2FA code sent successfully', { traineeId, email });
+
+    // Log to audit_logs
+    await supabaseAdmin.from('audit_logs').insert({
+      tenant_id: trainee.tenant_id,
+      action: '2fa.code_sent',
+      entity_type: 'trainee',
+      entity_id: traineeId,
+      details: {
+        email,
+        method: 'email',
+        expiresIn: 900,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: '2FA verification code sent to your email',
+        expiresIn: 900, // 15 minutes in seconds
+      },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    logger.error('[2FA] Error sending 2FA code', { error: error?.message });
+    return NextResponse.json(
+      { error: 'Failed to send verification code' },
+      { status: 500 }
+    );
+  }
+}

@@ -1,0 +1,76 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { lendingService } from '@/services/lendingService';
+import { requireRoleAsync } from '@/middleware/auth';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { createCsvDownloadResponse, objectsToCsv } from '@/utils/export';
+
+// OPTIONS /api/lendings/ -- Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/lendings/ -- Export lending records as CSV
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['local_admin', 'staff_inventory_manager', 'staff_training_coordinator']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+  
+  const user = authResult.user;
+  const context = {
+  userId: user.userId,
+  tenantId: user.tenantId,
+  role: user.role,
+  isSuperAdmin: user.role === 'super_admin',
+  };
+
+  const { searchParams } = new URL(request.url);
+  const trainee_id = searchParams.get('trainee_id') || undefined;
+  const status = searchParams.get('status') || undefined;
+  const start_date = searchParams.get('start_date') || searchParams.get('startDate') || undefined;
+  const end_date = searchParams.get('end_date') || searchParams.get('endDate') || undefined;
+
+  // Pass full context to service (Task 3.3: Services need isSuperAdmin flag)
+
+const lendings = await lendingService.getAllLendings(context, {
+  trainee_id,
+  status,
+  start_date,
+  end_date,
+  });
+
+  const rows = lendings.map((lending) => {
+  const traineeName = lending.trainee
+  ? `${lending.trainee.first_name} ${lending.trainee.last_name}`
+  : lending.borrower_name || '';
+
+  return {
+  id: lending.id,
+  item_name: lending.item?.name || '',
+  borrower: traineeName,
+  borrower_contact: lending.borrower_contact || '',
+  quantity: lending.quantity,
+  status: lending.status,
+  lent_date: lending.lent_date,
+  expected_return_date: lending.expected_return_date,
+  actual_return_date: lending.actual_return_date || '',
+  notes: lending.notes || '',
+  };
+  });
+
+  const csv = objectsToCsv(rows, [
+  'id',
+  'item_name',
+  'borrower',
+  'borrower_contact',
+  'quantity',
+  'status',
+  'lent_date',
+  'expected_return_date',
+  'actual_return_date',
+  'notes',
+  ]);
+
+  return createCsvDownloadResponse(csv, 'lendings-export.csv');
+});

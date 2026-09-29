@@ -1,0 +1,144 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { traineeService } from '@/services/traineeService';
+import { requireRoleAsync } from '@/middleware/auth';
+import { successResponse, notFoundResponse, errorResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { activityLogService } from '@/services/activityLogService';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { requireFeature, FeatureKey } from '@/lib/featureFlags';
+import { z } from 'zod';
+
+// Fields a trainee is permitted to update on their own profile (SEC-10)
+const updateTraineeSelfSchema = z.object({
+  phone: z.string().min(10).max(20).regex(/^[0-9+\-\s()]+$/).optional(),
+  province: z.string().min(1).max(100).optional(),
+  municipality: z.string().min(1).max(100).optional(),
+  barangay: z.string().min(1).max(100).optional(),
+  street: z.string().min(1).optional(),
+  photo_path: z.string().optional().nullable(),
+  emergency_contact_name: z.string().max(255).optional().nullable(),
+  emergency_contact_phone: z.string().max(50).optional().nullable(),
+});
+
+// OPTIONS /api/trainees/me - Handle CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+/**
+ * GET /api/trainees/me
+ * Get the current trainee's profile (trainee role only).
+ * Requires mobile_app_access feature flag (Req 23.4).
+ */
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['trainee']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const userId = authResult.user.userId;
+
+  // Resolve tenant from trainee account to check feature flag
+  const { data: traineeAccount, error: accountError } = await supabaseAdmin
+  .from('trainee_accounts')
+  .select(`
+  trainee_id,
+  trainees (
+  *,
+  programs (*)
+  )
+  `)
+  .eq('user_id', userId)
+  .single();
+
+  if (accountError || !traineeAccount) {
+  return notFoundResponse('Trainee profile not found for this user');
+  }
+
+const traineeData = traineeAccount.trainees as any;
+
+  // Feature gate: mobile_app_access must be enabled for this tenant (Req 23.4)
+  if (traineeData?.tenant_id) {
+  const featureCheck = await requireFeature(traineeData.tenant_id, FeatureKey.MOBILE_APP_ACCESS);
+  if (featureCheck) return featureCheck as any;
+  }
+
+  // Format the response to include program at the top level
+  const response = {
+  ...traineeData,
+  program: traineeData.programs ? traineeData.programs : undefined
+  };
+
+  // Remove the nested programs array from response
+  delete response.programs;
+
+  return successResponse(response);
+});
+
+/**
+ * PUT /api/trainees/me
+ * Update the current trainee's own profile (trainee role only)
+ * Trainees can only update certain fields
+ */
+export const PUT = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['trainee']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const userId = authResult.user.userId;
+
+  // Get trainee_id and tenant_id from trainee_accounts table
+  const { data: traineeAccount, error: accountError } = await supabaseAdmin
+  .from('trainee_accounts')
+  .select(`
+  trainee_id,
+  trainees (
+  tenant_id
+  )
+  `)
+  .eq('user_id', userId)
+  .single();
+
+  if (accountError || !traineeAccount) {
+  return notFoundResponse('Trainee profile not found for this user');
+  }
+
+const traineeId = traineeAccount.trainee_id;
+  const tenantId = (traineeAccount.trainees as any)?.tenant_id;
+  const body = await request.json();
+
+  // Only allow the fields defined in updateTraineeSelfSchema (SEC-10)
+  const updateData = updateTraineeSelfSchema.parse(body);
+
+  // Remove undefined keys so we don't accidentally null-out fields
+  const filteredData = Object.fromEntries(
+  Object.entries(updateData).filter(([, v]) => v !== undefined)
+  );
+
+  if (Object.keys(filteredData).length === 0) {
+  return errorResponse('No valid fields to update', 400);
+  }
+
+  // Update trainee profile
+  const { data: updatedTrainee, error: updateError } = await supabaseAdmin
+  .from('trainees')
+  .update(filteredData)
+  .eq('id', traineeId)
+  .select()
+  .single();
+
+  if (updateError) {
+  throw updateError;
+  }
+
+  // Log the activity
+  await activityLogService.logAction(
+  userId,
+  'update',
+  'trainee',
+  traineeId,
+  { fields: Object.keys(updateData), changes: updateData },
+  undefined,
+  tenantId
+  );
+
+  return successResponse(updatedTrainee, 'Profile updated successfully');
+});

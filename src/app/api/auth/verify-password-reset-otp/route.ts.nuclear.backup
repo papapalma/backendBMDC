@@ -1,0 +1,169 @@
+﻿/**
+ * POST /api/auth/verify-password-reset-otp
+ *
+ * Verify the first OTP entry during password reset (step 2 of 3).
+ *
+ * This is the first verification step. User enters the OTP they received via email.
+ * If valid, returns a temporary token for the next step.
+ *
+ * Request body:
+ * {
+ *   "email": "user@example.com",
+ *   "otp": "123456"
+ * }
+ *
+ * Response:
+ * {
+ *   "success": true,
+ *   "resetToken": "eyJhbGc...",
+ *   "expiresIn": 600
+ * }
+ *
+ * Error responses:
+ * - 400: Invalid or expired OTP
+ * - 429: Too many attempts
+ * - 500: Server error
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { validateOTP, getRemainingAttempts } from '@/services/otpService';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/utils/logger';
+import jwt from 'jsonwebtoken';
+
+interface VerifyPasswordResetOTPRequest {
+  email: string;
+  otp: string;
+}
+
+const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET || 'your-secret-key-change-in-production';
+const RESET_TOKEN_EXPIRY_SECONDS = 600; // 10 minutes
+
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  try {
+  const body: VerifyPasswordResetOTPRequest = await request.json();
+  const { email, otp } = body;
+
+  // Validate input
+  if (!email || !otp) {
+  return NextResponse.json(
+  { error: 'Email and OTP are required' },
+  { status: 400 }
+  );
+  }
+  if (otp.length !== 6 || !/^\d+$/.test(otp)) {
+  return NextResponse.json(
+  { error: 'OTP must be 6 digits' },
+  { status: 400 }
+  );
+  }
+
+const normalizedEmail = email.toLowerCase().trim();
+
+  logger.info('[PASSWORD_RESET] Verifying first OTP', { email: normalizedEmail });
+
+  // Validate OTP
+  const validationResult = await validateOTP(normalizedEmail, otp, 'password_reset');
+
+  if (!validationResult.valid) {
+  const remainingAttempts = validationResult.remainingAttempts ?? 0;
+
+  logger.warn('[PASSWORD_RESET] First OTP validation failed', {
+  email: normalizedEmail,
+  error: validationResult.error,
+  remainingAttempts,
+  });
+
+  // Return 429 if locked out
+  if (remainingAttempts === 0) {
+  return NextResponse.json(
+  {
+  error: 'Too many failed attempts. Please request a new reset code.',
+  locked: true,
+  },
+  { status: 429 }
+  );
+  }
+
+  return NextResponse.json(
+  {
+  error: validationResult.error,
+  remainingAttempts,
+  },
+  { status: 400 }
+  );
+  }
+
+  // OTP is valid - generate temporary reset token
+  const record = validationResult.record;
+
+  if (!record) {
+  logger.error('[PASSWORD_RESET] No OTP record found after validation', { email: normalizedEmail });
+  return NextResponse.json(
+  { error: 'Verification record not found' },
+  { status: 500 }
+  );
+  }
+
+  // Find user by email
+  const { data: user, error: userError } = await supabaseAdmin
+  .from('users')
+  .select('id, email')
+  .eq('email', normalizedEmail)
+  .single();
+
+  if (userError || !user) {
+  logger.error('[PASSWORD_RESET] User not found', { email: normalizedEmail });
+  return NextResponse.json(
+  { error: 'User not found' },
+  { status: 500 }
+  );
+  }
+
+  // Generate temporary reset token (JWT)
+  const resetToken = jwt.sign(
+  {
+  userId: user.id,
+  email: user.email,
+  type: 'password_reset_temp',
+  otpVerificationId: record.id,
+  // Store the OTP in the token so we can verify it matches on the next request
+  otpCode: record.code,
+  },
+  RESET_TOKEN_SECRET,
+  { expiresIn: `${RESET_TOKEN_EXPIRY_SECONDS}s` }
+  );
+
+  logger.info('[PASSWORD_RESET] First OTP verified, temp token generated', {
+  userId: user.id,
+  email: normalizedEmail,
+  });
+
+  // Log to audit_logs
+  await supabaseAdmin.from('audit_logs').insert({
+  tenant_id: null,
+  user_id: user.id,
+  action: 'password_reset.otp_verified_first',
+  entity_type: 'user',
+  entity_id: user.id,
+  details: {
+  email: user.email,
+  },
+  });
+
+  return NextResponse.json(
+  {
+  success: true,
+  resetToken,
+  expiresIn: RESET_TOKEN_EXPIRY_SECONDS,
+  },
+  { status: 200 }
+  );
+  } catch (error: any) {
+  logger.error('[PASSWORD_RESET] Error verifying first OTP', { error: error?.message });
+  return NextResponse.json(
+  { error: 'Failed to verify OTP' },
+  { status: 500 }
+  );
+  }
+}

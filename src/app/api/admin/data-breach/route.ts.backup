@@ -1,0 +1,25 @@
+/** * POST /api/admin/data-breach * * Report a data breach and trigger notifications (Req 22.6). * Restricted to Super Admin and Local Admin only. * * Requirements: 22.6 */import { NextRequest, NextResponse } from 'next/server';
+
+import { requireTenantContext } from '@/middleware/tenantContext';
+
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+
+import { withErrorHandler } from '@/middleware/errorHandler';
+
+import { handleOptionsRequest } from '@/middleware/cors';
+
+import { reportDataBreach } from '@/services/dataBreachService';
+
+import { z } from 'zod';
+
+const breachReportSchema = z.object({  title:                    z.string().min(1).max(255),  description:              z.string().min(1),  severity:                 z.enum(['low', 'medium', 'high', 'critical']),  affected_data_categories: z.array(z.string()).min(1),  estimated_affected_count: z.number().int().min(0),  affected_trainee_ids:     z.array(z.string().uuid()).optional(),  discovered_at:            z.string().datetime(),  containment_actions:      z.string().optional(),});
+
+export async function OPTIONS(request: NextRequest) {  return handleOptionsRequest(request);}export const POST = withErrorHandler(async (request: NextRequest) => {  const ctxResult = requireTenantContext(request);  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId, role, isSuperAdmin } = ctxResult.context;
+
+  const allowedRoles = ['local_admin'];  if (!allowedRoles.includes(role) && !isSuperAdmin) {    return forbiddenResponse('Only administrators can report data breaches');  }  const body = await request.json();
+
+  const validated = breachReportSchema.parse(body);
+
+  const result = await reportDataBreach({    tenantId:                isSuperAdmin ? (validated as any).tenant_id ?? tenantId : tenantId,    reportedBy:              userId,    title:                   validated.title,    description:             validated.description,    severity:                validated.severity,    affectedDataCategories:  validated.affected_data_categories,    estimatedAffectedCount:  validated.estimated_affected_count,    affectedTraineeIds:      validated.affected_trainee_ids,    discoveredAt:            validated.discovered_at,    containmentActions:      validated.containment_actions,  });  return successResponse(result, 'Data breach reported and notifications dispatched', 201);});

@@ -1,0 +1,124 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { requireRoleAsync } from '@/middleware/auth';
+import { successResponse, errorResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { requireFeature, FeatureKey } from '@/lib/featureFlags';
+
+/**
+ * Enrollment response interface
+ * Represents a trainee's enrollment in a program
+ */
+interface EnrollmentResponse {
+  id: string;
+  program_id: string;
+  status: string;
+  enrollment_date: string;
+  completed_date: string | null;
+}
+
+/**
+ * GET /api/trainees/me/enrollments
+ * Retrieve the current trainee's enrollment records
+ * 
+ * Requirements: 1.1, 1.10, 1.11
+ * 
+ * Access: Trainee role only
+ * Feature Flag: mobile_app_access
+ * 
+ * Response:
+ * - Array of enrollment objects with id, program_id, status, enrollment_date, completed_date
+ * - Ordered by enrollment_date DESC (most recent first)
+ * - Empty array if trainee has no enrollments
+ * 
+ * Error Responses:
+ * - 401 Unauthorized: User not authenticated
+ * - 403 Forbidden: User is not a trainee OR feature flag disabled
+ * - 500 Internal Server Error: Database error
+ */
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  // Authenticate and verify trainee role (Req 1.1, 1.10)
+
+const authResult = await requireRoleAsync(request, ['trainee']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const userId = authResult.user.userId;
+
+  // Get trainee_id and tenant_id from trainee_accounts table, with fallback to trainees.user_id
+
+let traineeId: string | null = null;
+  let tenantId: string | null = null;
+
+  const { data: traineeAccount } = await supabaseAdmin
+    .from('trainee_accounts')
+    .select(`
+    trainee_id,
+    trainees (
+    tenant_id
+    )
+    `)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (traineeAccount?.trainee_id) {
+    traineeId = traineeAccount.trainee_id;
+    tenantId = (traineeAccount.trainees as any)?.tenant_id;
+  } else {
+    // Fallback: query trainees directly by user_id
+    const { data: traineeByUser } = await supabaseAdmin
+      .from('trainees')
+      .select('id, tenant_id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (traineeByUser) {
+      traineeId = traineeByUser.id;
+      tenantId = traineeByUser.tenant_id;
+    }
+  }
+
+  if (!traineeId) {
+    return errorResponse('Trainee profile not found for this user', 404);
+  }
+
+  // Feature gate: mobile_app_access must be enabled for this tenant (Req 1.8, 1.9)
+
+if (tenantId) {
+  const featureCheck = await requireFeature(tenantId, FeatureKey.MOBILE_APP_ACCESS);
+  if (featureCheck) return featureCheck as any;
+  }
+
+  // Query enrollments for this trainee filtered by tenant_id (Req 1.6, 1.7)
+  // Tenant isolation: Join with trainees table to verify tenant context
+
+const { data: enrollments, error: enrollmentsError } = await supabaseAdmin
+  .from('enrollments')
+  .select(`
+  id,
+  program_id,
+  status,
+  enrollment_date,
+  completion_date
+  `)
+  .eq('trainee_id', traineeId)
+  .eq('tenant_id', tenantId)
+  .order('enrollment_date', { ascending: false });
+
+  if (enrollmentsError) {
+  throw enrollmentsError;
+  }
+
+  // Transform response: format dates as ISO 8601 (Req 5.6, 5.7)
+
+const formattedEnrollments: EnrollmentResponse[] = (enrollments || []).map((enrollment: any) => ({
+  id: enrollment.id,
+  program_id: enrollment.program_id,
+  status: enrollment.status,
+  enrollment_date: enrollment.enrollment_date, // Already in YYYY-MM-DD format
+  completed_date: (enrollment as any).completion_date || null, // Map completion_date to completed_date
+  }));
+
+  // Return response (Req 1.2, 1.3, 1.4, 1.5, 1.12)
+  // Empty array if trainee has no enrollments (Req 1.12)
+  return successResponse(formattedEnrollments);
+});

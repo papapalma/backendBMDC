@@ -1,0 +1,235 @@
+﻿/** * POST /api/upload/tenant * DELETE /api/upload/tenant * * Tenant-Isolated File Upload Endpoint * * Implements Requirements 15.2, 15.8: *  - 15.2  Store uploaded files in tenant-specific directories *  using /uploads/{tenant_id}/{file_type}/{filename} *  - 15.8  Enforce file size limits per tenant (configurable by Local Admin) *  Falls back to platform defaults if tenant config is absent. * * This endpoint replaces the legacy /api/upload for multi-tenant usage. * It requires a valid JWT with tenant context and stores files under the * tenant's scoped directory rather than the flat legacy structure. * * POST body (JSON): * { *  "file":  "<base64-encoded file data>", *  "category": "images/programs" | "images/trainees" | "images/items" | "images/cms" *  | "documents/programs" | "documents/trainees" | "documents/certificates" | "documents/reports" *  | "qrcodes/trainees" | "qrcodes/items" | "qrcodes/certificates", *  "filename": "original-name.jpg", *  "prefix":  "optional_prefix"  // optional * } * * DELETE body (JSON): * { *  "filePath": "/uploads/{tenant_id}/images/items/photo.jpg" * } */import { NextRequest, NextResponse } from 'next/server';
+
+import { promises as fs } from 'fs';
+
+import path from 'path';
+
+import crypto from 'crypto';
+
+import sharp from 'sharp';
+
+import { requireTenantContext } from '@/middleware/tenantContext';
+
+import { UPLOAD_BASE_DIR,  validateTenantId,  generateDocumentPath,  generateImagePath,  generateQRCodePath,  initTenantDirectories,  pathBelongsToTenant,  type DocumentSubType,  type ImageSubType,  type QRCodeSubType,} from '@/lib/fileStorage';
+
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+import { withErrorHandler } from '@/middleware/errorHandler';
+
+import { handleOptionsRequest } from '@/middleware/cors';
+
+import { forbiddenResponse, errorResponse, successResponse } from '@/utils/responses';
+
+import { logger } from '@/utils/logger';
+
+// ---------------------------------------------------------------------------// Constants// ---------------------------------------------------------------------------/** Platform-default file size limits (bytes) */
+const DEFAULT_MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+const DEFAULT_MAX_DOCUMENT_SIZE = 10 * 1024 * 1024; // 10 MB
+
+const THUMBNAIL_SIZE = 320;
+const THUMBNAIL_QUALITY = 82;
+
+const ALLOWED_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
+const ALLOWED_DOCUMENT_EXTENSIONS = new Set(['.pdf', '.doc', '.docx', '.xls', '.xlsx']);
+
+/** Magic byte signatures for content-type validation */
+const IMAGE_MAGIC: Array<{ magic: number[] }> = [
+  { magic: [0xff, 0xd8, 0xff] },
+  { magic: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] },
+  { magic: [0x47, 0x49, 0x46, 0x38] },
+  { magic: [0x52, 0x49, 0x46, 0x46] },
+];
+
+const DOCUMENT_MAGIC: Array<{ magic: number[] }> = [
+  { magic: [0x25, 0x50, 0x44, 0x46] },
+  { magic: [0x50, 0x4b, 0x03, 0x04] },
+  { magic: [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1] },
+];
+
+// ---------------------------------------------------------------------------// Valid category strings// ---------------------------------------------------------------------------type UploadCategory =  | 'images/programs' | 'images/trainees' | 'images/items' | 'images/cms'  | 'documents/programs' | 'documents/trainees' | 'documents/certificates' | 'documents/reports'  | 'qrcodes/trainees' | 'qrcodes/items' | 'qrcodes/certificates';
+
+const VALID_CATEGORIES: UploadCategory[] = [  'images/programs', 'images/trainees', 'images/items', 'images/cms',  'documents/programs', 'documents/trainees', 'documents/certificates', 'documents/reports',  'qrcodes/trainees', 'qrcodes/items', 'qrcodes/certificates',];
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function matchesMagic(buf: Buffer, sigs: Array<{ magic: number[] }>): boolean {
+  return sigs.some(({ magic }) => magic.every((b, i) => buf[i] === b));
+}
+
+function sanitizeFilename(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9._-]/g, '_').replace(/_{2,}/g, '_');
+}
+
+function generateUniqueFilename(original: string, prefix?: string): string {
+  const ext = path.extname(original).toLowerCase();
+  const base = sanitizeFilename(path.basename(original, ext));
+  const ts = Date.now();
+  const hash = crypto.randomBytes(4).toString('hex');
+  return prefix ? `${prefix}_${base}_${ts}_${hash}${ext}` : `${base}_${ts}_${hash}${ext}`;
+}
+
+/**
+ * Fetch the per-tenant max file size from the tenant configuration JSONB.
+ * Falls back to platform defaults if not configured.
+ */
+async function getTenantFileSizeLimits(
+  tenantId: string
+): Promise<{ maxImageSize: number; maxDocumentSize: number }> {
+  try {
+    const { data } = await supabaseAdmin
+      .from('tenants')
+      .select('configuration')
+      .eq('id', tenantId)
+      .maybeSingle();
+
+    const cfg = data?.configuration as Record<string, unknown> | null;
+    const limits = cfg?.fileLimits as Record<string, number> | undefined;
+    return {
+      maxImageSize: limits?.maxImageBytes ?? DEFAULT_MAX_IMAGE_SIZE,
+      maxDocumentSize: limits?.maxDocumentBytes ?? DEFAULT_MAX_DOCUMENT_SIZE,
+    };
+  } catch {
+    return { maxImageSize: DEFAULT_MAX_IMAGE_SIZE, maxDocumentSize: DEFAULT_MAX_DOCUMENT_SIZE };
+  }
+}// ---------------------------------------------------------------------------
+// CORS preflight
+// ---------------------------------------------------------------------------
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// ---------------------------------------------------------------------------
+// POST — upload a file to the tenant-scoped directory
+// ---------------------------------------------------------------------------
+
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  // ── 1. Auth ───────────────────────────────────────────────────────────────
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId } = ctxResult.context;
+
+  // ── 2. Parse body ─────────────────────────────────────────────────────────
+  const body = await request.json();
+  const { file, category, filename, prefix } = body as {
+    file?: string;
+    category?: string;
+    filename?: string;
+    prefix?: string;
+  };
+
+  if (!file) return errorResponse('file is required');
+  if (!category) return errorResponse('category is required');
+  if (!filename) return errorResponse('filename is required');
+  if (!VALID_CATEGORIES.includes(category as UploadCategory)) {
+    return errorResponse(
+      `Invalid category. Must be one of: ${VALID_CATEGORIES.join(', ')}`
+    );
+}
+
+// ── 3. Decode base64 ──────────────────────────────────────────────────────  const base64Data = file.replace(/^data:.*?;base64,/, '');
+
+  const fileBuffer = Buffer.from(base64Data, 'base64');
+
+  // ── 4. Validate extension ─────────────────────────────────────────────────  const ext = path.extname(filename).toLowerCase();
+  const isDocument = category.startsWith('documents/');
+
+  const isQRCode  = category.startsWith('qrcodes/');
+  const isImage  = category.startsWith('images/');
+  if (isDocument && !ALLOWED_DOCUMENT_EXTENSIONS.has(ext)) { return errorResponse(`File type ${ext} not allowed for documents`);
+}
+  if ((isImage || isQRCode) && !ALLOWED_IMAGE_EXTENSIONS.has(ext)) { return errorResponse(`Image type ${ext} not allowed`);
+}
+
+// ── 5. Validate magic bytes ───────────────────────────────────────────────  const expectedMagic = isDocument ? DOCUMENT_MAGIC : IMAGE_MAGIC;
+  if (!matchesMagic(fileBuffer, expectedMagic)) { return errorResponse('File content does not match the declared file type');
+}
+
+// ── 6. Validate file size (tenant-configurable) ───────────────────────────  const { maxImageSize, maxDocumentSize } = await getTenantFileSizeLimits(tenantId);
+
+  const maxSize = isDocument ? maxDocumentSize : maxImageSize;
+  if (fileBuffer.length > maxSize) { return errorResponse(  `File size ${(fileBuffer.length / 1024 / 1024).toFixed(2)} MB exceeds the ` +  `${(maxSize / 1024 / 1024).toFixed(0)} MB limit for this tenant`  );
+}
+
+// ── 7. Ensure tenant directories exist ───────────────────────────────────  await initTenantDirectories(tenantId);
+
+  // ── 8. Generate unique filename and paths ─────────────────────────────────  const uniqueFilename = generateUniqueFilename(filename, prefix);
+  const [topLevel, subType] = category.split('/') as [string, string];  let relativePath: string;  let absolutePath: string;  let thumbnailRelativePath: string | undefined;  let thumbnailUrl: string | undefined;
+  if (topLevel === 'documents') { const paths = generateDocumentPath(tenantId, subType as DocumentSubType, uniqueFilename);  relativePath = paths.relativePath;  absolutePath = paths.absolutePath;  } else if (topLevel === 'qrcodes') { const paths = generateQRCodePath(tenantId, subType as QRCodeSubType, uniqueFilename);  relativePath = paths.relativePath;  absolutePath = paths.absolutePath;  } else {  // images  const paths = generateImagePath(tenantId, subType as ImageSubType, uniqueFilename);  relativePath = paths.relativePath;  absolutePath = paths.absolutePath;  thumbnailRelativePath = paths.thumbnailRelativePath;
+
+  // Generate thumbnail  try { await sharp(fileBuffer)  .rotate()  .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: 'cover', position: 'centre' })  .webp({ quality: THUMBNAIL_QUALITY })  .toFile(paths.thumbnailAbsolutePath);  thumbnailUrl = paths.thumbnailUrl;  } catch (thumbErr) { logger.warn('[TENANT_UPLOAD] Thumbnail generation failed (non-fatal)', { tenantId,  filename: uniqueFilename,  error: thumbErr,  });  }  }
+
+// ── 9. Write file to disk ─────────────────────────────────────────────────  await fs.writeFile(absolutePath, fileBuffer);  logger.info('[TENANT_UPLOAD] File uploaded', { tenantId,  userId,  category,  relativePath,  sizeBytes: fileBuffer.length,  });
+
+  const baseUrl = (process.env.BACKEND_URL ?? 'http://localhost:3001').replace(/\/$/, '');
+  return successResponse({ filePath:  relativePath,  url:  `${baseUrl}${relativePath}`,  thumbnailPath:  thumbnailRelativePath,  thumbnailUrl,  }, 'File uploaded successfully');});
+
+// ---------------------------------------------------------------------------
+// DELETE — remove a file from the tenant-scoped directory
+// ---------------------------------------------------------------------------
+
+export const DELETE = withErrorHandler(async (request: NextRequest) => {
+  // ── 1. Auth ───────────────────────────────────────────────────────────────
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId } = ctxResult.context;
+
+  // ── 2. Parse body ─────────────────────────────────────────────────────────
+  const body = await request.json();
+  const { filePath } = body as { filePath?: string };
+
+  if (!filePath || typeof filePath !== 'string') {
+    return errorResponse('filePath is required');
+  }
+
+  // ── 3. Verify the file belongs to this tenant ─────────────────────────────
+  if (!pathBelongsToTenant(filePath, tenantId)) {
+    logger.warn('[TENANT_UPLOAD] Cross-tenant delete attempt blocked', {
+      userId,
+      tenantId,
+      filePath,
+    });
+    return forbiddenResponse('You do not have permission to delete this file');
+  }
+
+  // ── 4. Resolve absolute path ──────────────────────────────────────────────
+  const normalised = filePath.replace(/^\/+/, '');
+  const absolutePath = path.join(process.cwd(), 'public', normalised);
+
+  // Prevent path traversal
+  if (!absolutePath.startsWith(UPLOAD_BASE_DIR)) {
+    return errorResponse('Invalid file path');
+  }
+
+  // ── 5. Delete file (and thumbnail if image) ───────────────────────────────
+  try {
+    await fs.unlink(absolutePath);
+  } catch (err: unknown) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw err;
+    }
+    // File already gone — treat as success
+  }
+
+  // If it's an image, also delete the thumbnail
+  if (filePath.includes('/images/') && !filePath.includes('/thumbnails/')) {
+    const thumbNormalised = filePath
+      .replace(/\/images\/([^/]+)\/([^/]+)$/, '/images/$1/thumbnails/$2')
+      .replace(/\.[^.]+$/, '.webp')
+      .replace(/^\/+/, '');
+    const thumbAbsolute = path.join(process.cwd(), 'public', thumbNormalised);
+
+    try {
+      await fs.unlink(thumbAbsolute);
+    } catch {
+      // Thumbnail may not exist — ignore
+    }
+  }
+
+  logger.info('[TENANT_UPLOAD] File deleted', { tenantId, userId, filePath });
+  return NextResponse.json({ success: true, message: 'File deleted successfully' });
+});

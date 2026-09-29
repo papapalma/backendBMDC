@@ -1,0 +1,316 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { requireAuthAsync } from '@/middleware/auth';
+import { successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { comprehensiveReportSchema } from '@/utils/validators';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+const mapModuleToEntityType = (moduleName: string): string => {
+  const mapping: Record<string, string> = {
+  inventory: 'item',
+  trainees: 'trainee',
+  trainee: 'trainee',
+  programs: 'program',
+  lendings: 'lending',
+  lending: 'lending',
+  users: 'user',
+  auth: 'auth',
+  anomalies: 'anomaly',
+  };
+
+  return mapping[moduleName.toLowerCase()] || moduleName;
+};
+
+// OPTIONS /api/reports/comprehensive - Handle CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// POST /api/reports/comprehensive - Build comprehensive cross-module report
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const body = await request.json().catch(() => ({}));
+  const filters = comprehensiveReportSchema.parse(body) || {};
+
+  const startDate = filters.startDate;
+  const endDate = filters.endDate;
+  const moduleFilter = filters.module;
+  const user = authResult.user;
+
+  let traineesQuery = supabaseAdmin
+  .from('trainees')
+  .select('id, program_id, status, enrollment_date, created_at');
+
+  // Tenant isolation: non-super-admins can only see their own tenant's trainees
+  if (user.role !== 'super_admin') {
+  traineesQuery = traineesQuery.eq('tenant_id', user.tenantId);
+  }
+  if (startDate) traineesQuery = traineesQuery.gte('enrollment_date', startDate);
+  if (endDate) traineesQuery = traineesQuery.lte('enrollment_date', endDate);
+
+  let programsQuery = supabaseAdmin
+  .from('programs')
+  .select('id, name, status, max_trainees, start_date, end_date, created_at');
+
+  // Tenant isolation: non-super-admins can only see their own tenant's programs
+  if (user.role !== 'super_admin') {
+  programsQuery = programsQuery.eq('tenant_id', user.tenantId);
+  }
+  if (startDate) programsQuery = programsQuery.gte('start_date', startDate);
+  if (endDate) programsQuery = programsQuery.lte('start_date', endDate);
+
+  let lendingsQuery = supabaseAdmin
+  .from('lendings')
+  .select('id, status, quantity, lent_date, expected_return_date, actual_return_date, item:items(name)');
+
+  // Tenant isolation: non-super-admins can only see their own tenant's lendings
+  if (user.role !== 'super_admin') {
+  lendingsQuery = lendingsQuery.eq('tenant_id', user.tenantId);
+  }
+  if (startDate) lendingsQuery = lendingsQuery.gte('lent_date', startDate);
+  if (endDate) lendingsQuery = lendingsQuery.lte('lent_date', endDate);
+
+  let anomaliesQuery = supabaseAdmin
+  .from('anomalies')
+  .select('id, status, severity, category, detected_at');
+
+  // Tenant isolation: non-super-admins can only see their own tenant's anomalies
+  if (user.role !== 'super_admin') {
+  anomaliesQuery = anomaliesQuery.eq('tenant_id', user.tenantId);
+  }
+  if (startDate) anomaliesQuery = anomaliesQuery.gte('detected_at', startDate);
+  if (endDate) anomaliesQuery = anomaliesQuery.lte('detected_at', endDate);
+
+  let activityQuery = supabaseAdmin
+  .from('activity_logs')
+  .select('id, user_id, action, entity_type, created_at');
+
+  // Tenant isolation: non-super-admins can only see their own tenant's activity
+  if (user.role !== 'super_admin') {
+  activityQuery = activityQuery.eq('tenant_id', user.tenantId);
+  }
+  if (startDate) activityQuery = activityQuery.gte('created_at', startDate);
+  if (endDate) activityQuery = activityQuery.lte('created_at', endDate);
+  if (moduleFilter) activityQuery = activityQuery.eq('entity_type', mapModuleToEntityType(moduleFilter));
+
+  const [
+  { data: items, error: itemsError },
+  { data: trainees, error: traineesError },
+  { data: programs, error: programsError },
+  { data: lendings, error: lendingsError },
+  { data: anomalies, error: anomaliesError },
+  { data: activityLogs, error: activityError },
+  { data: users, error: usersError },
+  ] = await Promise.all([
+  user.role !== 'super_admin'
+  ? supabaseAdmin.from('items').select('id, category, status, quantity, available_quantity').eq('tenant_id', user.tenantId)
+  : supabaseAdmin.from('items').select('id, category, status, quantity, available_quantity'),
+  traineesQuery,
+  programsQuery,
+  lendingsQuery,
+  anomaliesQuery,
+  activityQuery,
+  user.role !== 'super_admin'
+  ? supabaseAdmin.from('users').select('id, role, email, username, created_at').eq('tenant_id', user.tenantId)
+  : supabaseAdmin.from('users').select('id, role, email, username, created_at'),
+  ]);
+
+  if (itemsError) throw itemsError;
+  if (traineesError) throw traineesError;
+  if (programsError) throw programsError;
+  if (lendingsError) throw lendingsError;
+  if (anomaliesError) throw anomaliesError;
+  if (activityError) throw activityError;
+  if (usersError) throw usersError;
+
+  const itemRows = items || [];
+  const traineeRows = trainees || [];
+  const programRows = programs || [];
+  const lendingRows = lendings || [];
+  const anomalyRows = anomalies || [];
+  const activityRows = activityLogs || [];
+  const userRows = users || [];
+
+  const now = new Date();
+
+  const dashboard = {
+  trainees: {
+  total: traineeRows.length,
+  active: traineeRows.filter((t) => t.status === 'active').length,
+  completed: traineeRows.filter((t) => t.status === 'completed').length,
+  inactive: traineeRows.filter((t) => t.status === 'inactive').length,
+  },
+  inventory: {
+  total: itemRows.length,
+  available: itemRows.reduce((sum, item) => sum + (item.available_quantity || 0), 0),
+  borrowed: itemRows.reduce((sum, item) => sum + ((item.quantity || 0) - (item.available_quantity || 0)), 0),
+  lowStock: itemRows.filter((item) => item.status === 'low_stock' || item.status === 'out_of_stock').length,
+  },
+  lending: {
+  total: lendingRows.length,
+  active: lendingRows.filter((l) => l.status === 'active').length,
+  overdue: lendingRows.filter((l) => l.status === 'active' && l.expected_return_date && new Date(l.expected_return_date) < now).length,
+  returned: lendingRows.filter((l) => l.status === 'returned').length,
+  },
+  programs: {
+  total: programRows.length,
+  ongoing: programRows.filter((p) => p.status === 'active').length,
+  upcoming: programRows.filter((p) => p.status === 'upcoming').length,
+  completed: programRows.filter((p) => p.status === 'completed').length,
+  },
+  };
+
+  const traineeByStatus = traineeRows.reduce((acc, trainee) => {
+  const statusKey = String(trainee.status);
+  acc[statusKey] = (acc[statusKey] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>);
+
+  const programNameById: Map<string, string> = new Map(programRows.map((program) => [(program.id as unknown) as string, (program.name as unknown) as string] as [string, string]));
+  const traineeByProgram = traineeRows.reduce((acc, trainee) => {
+  const pid = (trainee.program_id as unknown) as string;
+  const key: string = programNameById.get(pid) || 'Unknown Program';
+  acc[key] = (acc[key] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>);
+
+  const traineeTrendMap: Record<string, number> = {};
+  for (const trainee of traineeRows) {
+  const dateKey = (trainee.enrollment_date || trainee.created_at || '').split('T')[0];
+  if (!dateKey) continue;
+  traineeTrendMap[dateKey] = (traineeTrendMap[dateKey] || 0) + 1;
+  }
+
+const traineesReport = {
+  totalTrainees: traineeRows.length,
+  byProgram: traineeByProgram,
+  byStatus: traineeByStatus,
+  enrollmentTrend: Object.entries(traineeTrendMap)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([date, count]) => ({ date, count })),
+  completionRate: traineeRows.length > 0
+  ? Number((((traineeByStatus.completed || 0) / traineeRows.length) * 100).toFixed(2))
+  : 0,
+  };
+
+  const inventoryReport = {
+  totalItems: itemRows.length,
+  totalQuantity: itemRows.reduce((sum, item) => sum + (item.quantity || 0), 0),
+  availableQuantity: itemRows.reduce((sum, item) => sum + (item.available_quantity || 0), 0),
+  borrowedQuantity: itemRows.reduce((sum, item) => sum + ((item.quantity || 0) - (item.available_quantity || 0)), 0),
+  byStatus: itemRows.reduce((acc, item) => {
+  acc[item.status] = (acc[item.status] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>),
+  byCategory: itemRows.reduce((acc, item) => {
+  acc[item.category] = (acc[item.category] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>),
+  };
+
+  const lendingByStatus = lendingRows.reduce((acc, lending) => {
+  acc[lending.status] = (acc[lending.status] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>);
+
+  const lendingTrendMap: Record<string, number> = {};
+  for (const lending of lendingRows) {
+  const dateKey = (lending.lent_date || '').split('T')[0];
+  if (!dateKey) continue;
+  lendingTrendMap[dateKey] = (lendingTrendMap[dateKey] || 0) + 1;
+  }
+
+const lendingsReport = {
+  totalTransactions: lendingRows.length,
+  activeLoans: lendingByStatus.active || 0,
+  overdueItems: lendingRows.filter((l) => l.status === 'overdue').length,
+  returnRate: lendingRows.length > 0
+  ? Number((((lendingByStatus.returned || 0) / lendingRows.length) * 100).toFixed(2))
+  : 0,
+  popularItems: Object.entries(
+  lendingRows.reduce((acc, lending) => {
+  const itemName = (lending.item as { name?: string } | null)?.name || 'Unknown Item';
+  acc[itemName] = (acc[itemName] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>)
+  )
+  .map(([name, borrowCount]) => ({ name, borrowCount: borrowCount as number }))
+  .sort((a, b) => b.borrowCount - a.borrowCount)
+  .slice(0, 10),
+  borrowingTrend: Object.entries(lendingTrendMap)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([date, count]) => ({ date, count })),
+  };
+
+  const usersByRole = userRows.reduce((acc, user) => {
+  acc[user.role] = (acc[user.role] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>);
+
+  const activityByUser = activityRows.reduce((acc, log) => {
+  if (!log.user_id) return acc;
+  acc[log.user_id] = (acc[log.user_id] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>);
+
+  const usersReport = {
+  totalUsers: userRows.length,
+  byRole: usersByRole,
+  activeUsers: userRows.filter((user) => (activityByUser[user.id] || 0) > 0).length,
+  inactiveUsers: userRows.filter((user) => (activityByUser[user.id] || 0) === 0).length,
+  userActivity: userRows.map((user) => ({
+  id: user.id,
+  username: user.username,
+  email: user.email,
+  role: user.role,
+  activityCount: activityByUser[user.id] || 0,
+  created_at: user.created_at,
+  })),
+  };
+
+  const activityReport = {
+  totalActions: activityRows.length,
+  byAction: activityRows.reduce((acc, log) => {
+  acc[log.action] = (acc[log.action] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>),
+  byEntityType: activityRows.reduce((acc, log) => {
+  acc[log.entity_type] = (acc[log.entity_type] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>),
+  };
+
+  const anomaliesReport = {
+  total: anomalyRows.length,
+  byStatus: anomalyRows.reduce((acc, anomaly) => {
+  acc[anomaly.status] = (acc[anomaly.status] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>),
+  bySeverity: anomalyRows.reduce((acc, anomaly) => {
+  acc[anomaly.severity] = (acc[anomaly.severity] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>),
+  byCategory: anomalyRows.reduce((acc, anomaly) => {
+  acc[anomaly.category] = (acc[anomaly.category] || 0) + 1;
+  return acc;
+  }, {} as Record<string, number>),
+  };
+
+  return successResponse({
+  generated_at: new Date().toISOString(),
+  generated_by: authResult.user.email,
+  filters,
+  dashboard,
+  reports: {
+  trainees: traineesReport,
+  inventory: inventoryReport,
+  lendings: lendingsReport,
+  activity: activityReport,
+  users: usersReport,
+  anomalies: anomaliesReport,
+  },
+  });
+});

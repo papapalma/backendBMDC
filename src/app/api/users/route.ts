@@ -1,0 +1,125 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { hashPassword } from '@/lib/auth';
+import { successResponse, createdResponse, errorResponse } from '@/utils/responses';
+import { requireRoleAsync } from '@/middleware/auth';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { z } from 'zod';
+
+// OPTIONS /api/users - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+const createUserSchema = z.object({
+  email: z.string().email().max(255).toLowerCase().trim(),
+  username: z.string().min(3).max(100).trim(),
+  password: z.string().min(6).max(100),
+  role: z.enum(['local_admin', 'staff_training_coordinator', 'staff_inventory_manager']).default('staff_inventory_manager'),
+});
+
+/**
+ * GET /api/users
+ * Get all users in the tenant (local_admin only)
+ */
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['local_admin']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const user = authResult.user;
+  const { searchParams } = new URL(request.url);
+  const search = searchParams.get('search') || '';
+  const role = searchParams.get('role');
+
+  // Local admins can only see users in their tenant
+
+let query = supabaseAdmin
+  .from('users_tenants')
+  .select('user_id')
+  .eq('tenant_id', user.tenantId);
+
+  const { data: tenantUsers, error: tenantError } = await query;
+  if (tenantError) throw tenantError;
+
+  const userIds = tenantUsers?.map(ut => ut.user_id) || [];
+  
+  if (userIds.length === 0) {
+  return successResponse([]);
+  }
+
+let userQuery = supabaseAdmin
+  .from('users')
+  .select('id, email, username, role, created_at, updated_at')
+  .in('id', userIds)
+  .not('role', 'eq', 'super_admin')  // Explicitly exclude super admin accounts
+  .order('created_at', { ascending: false });
+
+  if (search) {
+  userQuery = userQuery.or(`email.ilike.%${search}%,username.ilike.%${search}%`);
+  }
+
+if (role) {
+  userQuery = userQuery.eq('role', role);
+  }
+
+const { data: users, error } = await userQuery;
+  if (error) throw error;
+
+  return successResponse(users);
+});
+
+/**
+ * POST /api/users
+ * Create a new user (local_admin only - within their tenant)
+ */
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['local_admin']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const user = authResult.user;
+  const body = await request.json();
+  const validatedData = createUserSchema.parse(body);
+
+  // Check if user already exists
+  const { data: existingUser } = await supabaseAdmin
+  .from('users')
+  .select('id')
+  .eq('email', validatedData.email)
+  .single();
+
+  if (existingUser) {
+  return errorResponse('User with this email already exists', 409);
+  }
+
+const passwordHash = await hashPassword(validatedData.password);
+
+  const { data: newUser, error } = await supabaseAdmin
+  .from('users')
+  .insert({
+  email: validatedData.email,
+  username: validatedData.username,
+  password_hash: passwordHash,
+  role: validatedData.role,
+  })
+  .select('id, email, username, role, created_at, updated_at')
+  .single();
+
+  if (error) throw error;
+
+  // Assign user to the local admin's tenant via users_tenants junction table
+
+const { error: tenantLinkError } = await supabaseAdmin
+  .from('users_tenants')
+  .insert({
+  user_id: newUser.id,
+  tenant_id: user.tenantId,
+  is_primary: false,
+  });
+
+  if (tenantLinkError) throw tenantLinkError;
+
+  return createdResponse(newUser);
+});
+

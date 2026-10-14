@@ -1,0 +1,99 @@
+﻿/**
+ * GET /api/reports/trainee-demographics
+ *
+ * Tenant-scoped trainee demographics report (Req 4.6).
+ * Returns trainee statistics including status, sex, classification,
+ * employment, education, and municipality breakdowns.
+ * Supports date range filtering and PDF/CSV export.
+ *
+ * Requirements: 4.6, 10.8, 10.9
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { getTraineeDemographics } from '@/services/reportingService';
+import {
+  buildSimplePdf,
+  createPdfDownloadResponse,
+  objectsToCsv,
+  createCsvDownloadResponse,
+} from '@/utils/export';
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId, role, isSuperAdmin } = ctxResult.context;
+
+  const allowedRoles = [
+  'local_admin',
+  'staff_training_coordinator',
+  ];
+  if (!allowedRoles.includes(role) && !isSuperAdmin) {
+  return forbiddenResponse('Insufficient permissions to view trainee demographics');
+}
+
+  const { searchParams } = new URL(request.url);
+  const startDate = searchParams.get('start_date') || searchParams.get('startDate') || undefined;
+  const endDate = searchParams.get('end_date') || searchParams.get('endDate') || undefined;
+  const format = searchParams.get('format') || 'json';
+
+  const targetTenantId = isSuperAdmin
+  ? (searchParams.get('tenant_id') || tenantId)
+  : tenantId;
+
+  const report = await getTraineeDemographics(targetTenantId, userId, { startDate, endDate });
+
+  // PDF export (Req 10.8)
+  if (format === 'pdf') {
+  const lines = [
+  `Generated: ${report.generatedAt}`,
+  `Tenant: ${report.tenantId}`,
+  '',
+  `Total Trainees: ${report.totalTrainees}`,
+  `Completion Rate: ${report.completionRate}%`,
+  '',
+  '--- By Status ---',
+  ...Object.entries(report.byStatus).map(([k, v]) => `  ${k}: ${v}`),
+  '',
+  '--- By Sex ---',
+  ...Object.entries(report.bySex).map(([k, v]) => `  ${k}: ${v}`),
+  '',
+  '--- By Classification ---',
+  ...Object.entries(report.byClassification).map(([k, v]) => `  ${k}: ${v}`),
+  '',
+  '--- By Employment Status ---',
+  ...Object.entries(report.byEmploymentStatus).map(([k, v]) => `  ${k}: ${v}`),
+  '',
+  '--- By Educational Attainment ---',
+  ...Object.entries(report.byEducationalAttainment).map(([k, v]) => `  ${k}: ${v}`),
+  '',
+  '--- By Municipality ---',
+  ...Object.entries(report.byMunicipality)
+  .sort(([, a], [, b]) => b - a)
+  .slice(0, 20)
+  .map(([k, v]) => `  ${k}: ${v}`),
+  ];
+  const pdf = buildSimplePdf('Trainee Demographics Report', lines);
+  return createPdfDownloadResponse(pdf, `trainee-demographics-${targetTenantId}-${Date.now()}.pdf`);
+}
+
+  // CSV export — enrollment trend (Req 10.8)
+  if (format === 'csv') {
+  const rows = report.enrollmentTrend.map((t) => ({
+  date: t.date,
+  enrollments: t.count,
+  }));
+  const csv = objectsToCsv(rows);
+  return createCsvDownloadResponse(csv, `trainee-demographics-${targetTenantId}-${Date.now()}.csv`);
+}
+
+  return successResponse(report);
+});

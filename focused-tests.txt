@@ -1,0 +1,525 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand --testPathPatterns=privilege-escalation|attendance-submit|cross-tenant|trainee-auth --no-coverage
+PASS src/__tests__/api/privilege-escalation-logging.test.ts
+  ΓùÅ Console
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-ad'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result { tokenFound: true, tokenLength: 16, tokenPrefix: 'fake-token-admin' }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+          at Array.forEach (<anonymous>)
+
+PASS src/__tests__/api/attendance-submit-auth.test.ts
+  ΓùÅ Console
+
+    console.log
+      [2026-10-05T04:20:47.690Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 0,
+        status: 'success'
+      }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+    console.log
+      [2026-10-05T04:20:47.696Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 0,
+        status: 'success'
+      }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+    console.log
+      [2026-10-05T04:20:47.697Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 1,
+        status: 'success'
+      }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+    console.log
+      [2026-10-05T04:20:47.699Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 2,
+        status: 'success'
+      }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+    console.log
+      [2026-10-05T04:20:47.701Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 1,
+        status: 'success'
+      }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+    console.log
+      [2026-10-05T04:20:47.701Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 0,
+        status: 'success'
+      }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+    console.log
+      [2026-10-05T04:20:47.702Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 0,
+        status: 'success'
+      }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+    console.log
+      [2026-10-05T04:20:47.707Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 4,
+        status: 'success'
+      }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+    console.log
+      [2026-10-05T04:20:47.708Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 0,
+        status: 'success'
+      }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+    console.error
+      [2026-10-05T04:20:47.709Z] [ERROR] [REQUEST_OBSERVABILITY] Request failed {
+        method: 'POST',
+        url: 'http://localhost:3000/api/attendance/submit',
+        durationMs: 1,
+        status: 'error',
+        errorType: 'ZodError'
+      }
+
+       8 |     switch (level) {
+       9 |       case 'error':
+    > 10 |         console.error(logMessage, meta || '');
+         |                 ^
+      11 |         break;
+      12 |       case 'warn':
+      13 |         console.warn(logMessage, meta || '');
+
+      at Logger.log (src/utils/logger.ts:10:17)
+      at Logger.error (src/utils/logger.ts:34:10)
+      at src/middleware/errorHandler.ts:109:14
+      at Object.<anonymous> (src/__tests__/api/attendance-submit-auth.test.ts:588:22)
+
+    console.error
+      [2026-10-05T04:20:47.709Z] [ERROR] Request error: ZodError: [
+        {
+          "expected": "'morning' | 'afternoon'",
+          "received": "null",
+          "code": "invalid_type",
+          "path": [
+            "session_label"
+          ],
+          "message": "Expected 'morning' | 'afternoon', received null"
+        }
+      ]
+          at Object.get error [as error] (C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\node_modules\zod\v3\types.cjs:45:31)
+          at ZodObject.parse (C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\node_modules\zod\v3\types.cjs:120:22)
+          at C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\src\app\api\attendance\submit\route.ts:282:37
+          at C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\src\middleware\errorHandler.ts:91:22
+          at Object.<anonymous> (C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\src\__tests__\api\attendance-submit-auth.test.ts:588:22) {
+        issues: [
+          {
+            expected: "'morning' | 'afternoon'",
+            received: 'null',
+            code: 'invalid_type',
+            path: [Array],
+            message: "Expected 'morning' | 'afternoon', received null"
+          }
+        ],
+        addIssue: [Function (anonymous)],
+        addIssues: [Function (anonymous)]
+      }
+
+       8 |     switch (level) {
+       9 |       case 'error':
+    > 10 |         console.error(logMessage, meta || '');
+         |                 ^
+      11 |         break;
+      12 |       case 'warn':
+      13 |         console.warn(logMessage, meta || '');
+
+      at Logger.log (src/utils/logger.ts:10:17)
+      at Logger.error (src/utils/logger.ts:34:10)
+      at handleError (src/middleware/errorHandler.ts:9:10)
+      at src/middleware/errorHandler.ts:117:34
+      at Object.<anonymous> (src/__tests__/api/attendance-submit-auth.test.ts:588:22)
+
+    console.error
+      Γ¥î Full error details: {
+        "issues": [
+          {
+            "expected": "'morning' | 'afternoon'",
+            "received": "null",
+            "code": "invalid_type",
+            "path": [
+              "session_label"
+            ],
+            "message": "Expected 'morning' | 'afternoon', received null"
+          }
+        ],
+        "name": "ZodError"
+      }
+
+       9 |   logger.error('Request error:', error);
+      10 |   // Always dump to console so the real cause is visible in the server terminal
+    > 11 |   console.error('Γ¥î Full error details:', JSON.stringify(error, null, 2));
+         |           ^
+      12 |
+      13 |   // Zod validation errors
+      14 |
+
+      at handleError (src/middleware/errorHandler.ts:11:11)
+      at src/middleware/errorHandler.ts:117:34
+      at Object.<anonymous> (src/__tests__/api/attendance-submit-auth.test.ts:588:22)
+
+    console.error
+      Γ¥î Validation errors: {
+        session_label: [ "Expected 'morning' | 'afternoon', received null" ]
+      }
+
+      22 |       errors[path].push(err.message);
+      23 |     });
+    > 24 |     console.error('Γ¥î Validation errors:', errors);
+         |             ^
+      25 |     return validationErrorResponse(errors);
+      26 |   }
+      27 |
+
+      at handleError (src/middleware/errorHandler.ts:24:13)
+      at src/middleware/errorHandler.ts:117:34
+      at Object.<anonymous> (src/__tests__/api/attendance-submit-auth.test.ts:588:22)
+
+PASS src/__tests__/api/cross-tenant-isolation.test.ts
+PASS src/__tests__/security/privilege-escalation.test.ts
+
+Test Suites: 4 passed, 4 total
+Tests:       61 passed, 61 total
+Snapshots:   0 total
+Time:        2.66 s, estimated 3 s
+Ran all test suites matching privilege-escalation|attendance-submit|cross-tenant|trainee-auth.

@@ -1,0 +1,70 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { requireAuthAsync } from '@/middleware/auth';
+import { successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/programs/stats - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/programs/stats - Get program statistics for the current tenant
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireAuthAsync(request);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const tenantId = authResult.user.tenantId;
+
+  const [programsResult, traineesResult, sessionsResult] = await Promise.all([
+    supabaseAdmin.from('programs').select('id, name, status').eq('tenant_id', tenantId),
+    supabaseAdmin.from('trainees').select('id, program_id, status').eq('tenant_id', tenantId),
+    supabaseAdmin.from('program_sessions').select('id, program_id').eq('tenant_id', tenantId),
+  ]);
+
+  if (programsResult.error) throw programsResult.error;
+  if (traineesResult.error) throw traineesResult.error;
+  if (sessionsResult.error) throw sessionsResult.error;
+
+  const programs = programsResult.data || [];
+  const trainees = traineesResult.data || [];
+  const sessions = sessionsResult.data || [];
+
+  const traineeCountByProgram: Record<string, number> = {};
+  trainees.forEach((trainee) => {
+    if (!trainee.program_id) return;
+    traineeCountByProgram[trainee.program_id] = (traineeCountByProgram[trainee.program_id] || 0) + 1;
+  });
+
+  const sessionCountByProgram: Record<string, number> = {};
+  sessions.forEach((session) => {
+    if (!session.program_id) return;
+    sessionCountByProgram[session.program_id] = (sessionCountByProgram[session.program_id] || 0) + 1;
+  });
+
+  const programStats = programs.map((program) => ({
+    id: program.id,
+    name: program.name,
+    status: program.status,
+    traineeCount: traineeCountByProgram[program.id] || 0,
+    sessionCount: sessionCountByProgram[program.id] || 0,
+  }));
+
+  const totalPrograms = programs.length;
+
+  return successResponse({
+    totalPrograms,
+    active: programs.filter((p) => p.status === 'active').length,
+    upcoming: programs.filter((p) => p.status === 'upcoming').length,
+    completed: programs.filter((p) => p.status === 'completed').length,
+    cancelled: programs.filter((p) => p.status === 'cancelled').length,
+    totalTrainees: trainees.length,
+    totalSessions: sessions.length,
+    averageTraineesPerProgram:
+      totalPrograms > 0 ? Number((trainees.length / totalPrograms).toFixed(2)) : 0,
+    programStats,
+  });
+});

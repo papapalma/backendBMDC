@@ -1,0 +1,190 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand --testPathPatterns=trainee-authorization
+  console.log
+    [2026-10-05T06:01:20.187Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      durationMs: 1,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+  console.log
+    [2026-10-05T06:01:20.208Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=bbbbbbbb-cccc-dddd-eeee-ffffffffffff',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+  console.log
+    [2026-10-05T06:01:20.211Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?session_id=session-123&program_id=program-1&date=2024-01-15',
+      durationMs: 1,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+  console.log
+    [2026-10-05T06:01:20.212Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?session_id=session-456&program_id=tenant-b-program-1&date=2024-01-15',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+  console.log
+    [2026-10-05T06:01:20.213Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=bbbbbbbb-cccc-dddd-eeee-ffffffffffff',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+  console.log
+    [2026-10-05T06:01:20.214Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?session_id=session-999&program_id=tenant-b-program&date=2024-01-15',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+  console.log
+    [2026-10-05T06:01:20.215Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=not-a-uuid',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+  console.log
+    [2026-10-05T06:01:20.216Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+  console.log
+    [2026-10-05T06:01:20.217Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+  console.log
+    [2026-10-05T06:01:20.218Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:21:17)
+
+FAIL src/__tests__/api/trainee-authorization.test.ts
+  GET /api/attendance - Trainee Authorization
+    ├ù Test 1: should allow trainee to fetch their own attendance records (18 ms)
+    ├ù Test 2: should deny trainee attempting to fetch another trainees attendance (2 ms)
+    ΓêÜ Test 3: should allow staff to fetch attendance for their tenant trainees (1 ms)
+    ΓêÜ Test 4: should deny staff attempting to access attendance from different tenant
+    ├ù Test 5: should log access denial when trainee tries to fetch other trainee data (1 ms)
+    ΓêÜ Test 6: should log access denial when staff tries cross-tenant access (1 ms)
+  GET /api/attendance - Edge Cases
+    ├ù Test 7: should return 400 when trainee_id is not a valid UUID (1 ms)
+    ΓêÜ Test 8: should return 400 when tenant context is missing (1 ms)
+    ΓêÜ Test 9: should require trainee to specify trainee_id in query
+    ΓêÜ Test 10: should handle case where trainee resolution returns null (1 ms)
+
+  ΓùÅ GET /api/attendance - Trainee Authorization ΓÇ║ Test 1: should allow trainee to fetch their own attendance records
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 403
+
+      193 |
+      194 |     // Assert
+    > 195 |     expect(response.status).toBe(200);
+          |                             ^
+      196 |     const body = await response.json();
+      197 |     expect(body.success).toBe(true);
+      198 |     expect(Array.isArray(body.data)).toBe(true);
+
+      at Object.<anonymous> (src/__tests__/api/trainee-authorization.test.ts:195:29)
+
+  ΓùÅ GET /api/attendance - Trainee Authorization ΓÇ║ Test 2: should deny trainee attempting to fetch another trainees attendance
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Cannot view other trainees' data"
+    Received string:    "Insufficient permissions to view attendance records"
+
+      221 |     expect(response.status).toBe(403);
+      222 |     const body = await response.json();
+    > 223 |     expect(body.error).toContain("Cannot view other trainees' data");
+          |                        ^
+      224 |   });
+      225 |
+      226 |   // =========================================================================
+
+      at Object.<anonymous> (src/__tests__/api/trainee-authorization.test.ts:223:24)
+
+  ΓùÅ GET /api/attendance - Trainee Authorization ΓÇ║ Test 5: should log access denial when trainee tries to fetch other trainee data
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: ObjectContaining {"action": StringMatching /denied|denied_access|authz_denied/i, "details": ObjectContaining {"reason": Any<String>}, "resource": "attendance", "status": "denied", "userId": "770e8400-e29b-41d4-a716-446655440000"}
+
+    Number of calls: 0
+
+      328 |
+      329 |     // Assert: activityLogService.logAction was called for the denial
+    > 330 |     expect(activityLogService.logAction).toHaveBeenCalledWith(
+          |                                          ^
+      331 |       expect.objectContaining({
+      332 |         userId: USER_A_ID,
+      333 |         action: expect.stringMatching(/denied|denied_access|authz_denied/i),
+
+      at Object.<anonymous> (src/__tests__/api/trainee-authorization.test.ts:330:42)
+
+  ΓùÅ GET /api/attendance - Edge Cases ΓÇ║ Test 7: should return 400 when trainee_id is not a valid UUID
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 403
+
+      406 |
+      407 |     // Assert
+    > 408 |     expect(response.status).toBe(400);
+          |                             ^
+      409 |     const body = await response.json();
+      410 |     expect(body.error).toContain('Invalid');
+      411 |   });
+
+      at Object.<anonymous> (src/__tests__/api/trainee-authorization.test.ts:408:29)
+
+Test Suites: 1 failed, 1 total
+Tests:       4 failed, 6 passed, 10 total
+Snapshots:   0 total
+Time:        0.39 s, estimated 1 s
+Ran all test suites matching trainee-authorization.

@@ -1,0 +1,114 @@
+/**
+ * GET  /api/certificates  — list certificates / registry (tenant-scoped, Req 16.9)
+ * POST /api/certificates  — issue a certificate (tenant-scoped, Req 16.1–16.5, 16.8)
+ *
+ * Requirements: 16.1, 16.2, 16.3, 16.4, 16.5, 16.8, 16.9, 23.4
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { successResponse, forbiddenResponse, errorResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { generateCertificate, listCertificates } from '@/services/certificateService';
+import { notifyTrainingCompletion } from '@/services/notificationService';
+import { requireFeature, FeatureKey } from '@/lib/featureFlags';
+import { z } from 'zod';
+
+const issueCertificateSchema = z.object({
+  enrollment_id: z.string().uuid('Invalid enrollment ID'),
+  template_id: z.string().optional(),
+});
+
+// OPTIONS /api/certificates
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/certificates — certificate registry (tenant-scoped, Req 16.9)
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, role, isSuperAdmin } = ctxResult.context;
+
+  const allowedRoles = [
+    'local_admin',
+    'staff_training_coordinator',
+    'staff_inventory_manager',
+  ];
+  if (!allowedRoles.includes(role)) {
+    return forbiddenResponse('Insufficient permissions to view certificates');
+  }
+
+const { searchParams } = new URL(request.url);
+  const dateFrom = searchParams.get('date_from') || undefined;
+  const dateTo = searchParams.get('date_to') || undefined;
+  const programId = searchParams.get('program_id') || undefined;
+  const traineeId = searchParams.get('trainee_id') || undefined;
+
+  const certificates = await listCertificates(
+    isSuperAdmin ? (searchParams.get('tenant_id') || tenantId) : tenantId,
+    { dateFrom, dateTo, programId, traineeId }
+  );
+  return successResponse(certificates);
+});
+
+// POST /api/certificates — issue a certificate (Req 16.1–16.5, 16.8, 23.4)
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId, role } = ctxResult.context;
+
+  const allowedRoles = [
+    'local_admin',
+    'staff_training_coordinator',
+  ];
+  if (!allowedRoles.includes(role)) {
+    return forbiddenResponse('Insufficient permissions to issue certificates');
+  }
+
+  // Feature gate: certificate_generation must be enabled for this tenant (Req 23.4)
+
+const featureCheck = await requireFeature(tenantId, FeatureKey.CERTIFICATE_GENERATION);
+  if (featureCheck) return featureCheck as any;
+
+  const body = await request.json();
+  const { enrollment_id, template_id } = issueCertificateSchema.parse(body);
+
+  // Generate the certificate (validates completion, prevents duplicates)
+
+const certificate = await generateCertificate({
+    tenantId,
+    enrollmentId: enrollment_id,
+    templateId: template_id,
+    issuedBy: userId,
+  });
+
+  // Trigger completion notification to trainee (Req 12.4, 16.9)
+  // Fetch trainee_id from enrollment for notification
+  try {
+    const { supabaseAdmin } = await import('@/lib/supabase-admin');
+
+    const { data: enrollment } = await supabaseAdmin
+      .from('enrollments')
+      .select('trainee_id, program:programs(name)')
+      .eq('id', enrollment_id)
+      .maybeSingle();
+
+    if (enrollment) {
+      const programName = (enrollment.program as any)?.name ?? 'Training Program';
+      await notifyTrainingCompletion({
+        tenantId,
+        traineeId: enrollment.trainee_id,
+        programName,
+        certificateUrl: certificate.verification_url ?? '',
+      });
+    }
+  } catch (notifError) {
+    // Non-critical — certificate was issued; notification failure should not block
+    console.warn('[CERTIFICATE] Completion notification failed (non-critical):', notifError);
+  }
+
+  return successResponse(certificate, 'Certificate issued successfully', 201);
+});

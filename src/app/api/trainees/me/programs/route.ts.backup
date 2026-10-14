@@ -1,0 +1,139 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { requireRoleAsync } from '@/middleware/auth';
+import { successResponse, errorResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { requireFeature, FeatureKey } from '@/lib/featureFlags';
+
+/**
+ * Program response interface
+ * Represents a program with the trainee's enrollment status
+ */
+interface ProgramResponse {
+  id: string;
+  name: string;
+  description: string | null;
+  start_date: string;
+  end_date: string;
+  status: string;
+  instructor: string | null;
+  enrollment_status: string;
+}
+
+/**
+ * GET /api/trainees/me/programs
+ * Retrieve the current trainee's enrolled programs with program details and enrollment status
+ * 
+ * Requirements: 2.1, 2.13, 2.14
+ * 
+ * Access: Trainee role only
+ * Feature Flag: mobile_app_access
+ * 
+ * Query Parameters:
+ * - status (optional): Filter by enrollment status (active|completed|dropped|enrolled)
+ *   Invalid values are ignored, returns all programs
+ * 
+ * Response:
+ * - Array of program objects with id, name, description, start_date, end_date, status, instructor, enrollment_status
+ * - Empty array if trainee has no enrollments
+ * 
+ * Error Responses:
+ * - 401 Unauthorized: User not authenticated
+ * - 403 Forbidden: User is not a trainee OR feature flag disabled
+ * - 500 Internal Server Error: Database error
+ */
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  // Authenticate and verify trainee role (Req 2.1, 2.13, 2.14)
+  const authResult = await requireRoleAsync(request, ['trainee']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const userId = authResult.user.userId;
+
+  // Get trainee_id and tenant_id from trainee_accounts table
+  const { data: traineeAccount, error: accountError } = await supabaseAdmin
+    .from('trainee_accounts')
+    .select(`
+      trainee_id,
+      trainees (
+        tenant_id
+      )
+    `)
+    .eq('user_id', userId)
+    .single();
+
+  if (accountError || !traineeAccount) {
+    return errorResponse('Trainee profile not found for this user', 404);
+  }
+
+  const traineeId = traineeAccount.trainee_id;
+  const tenantId = (traineeAccount.trainees as any)?.tenant_id;
+
+  // Feature gate: mobile_app_access must be enabled for this tenant (Req 2.11, 2.12)
+  if (tenantId) {
+    const featureCheck = await requireFeature(tenantId, FeatureKey.MOBILE_APP_ACCESS);
+    if (featureCheck) return featureCheck as any;
+  }
+
+  // Parse and validate status query parameter (Req 2.4, 2.5, 2.6, 2.7, 2.8)
+  const url = new URL(request.url);
+  const statusParam = url.searchParams.get('status');
+  
+  // Validate status parameter - only accept valid values
+  const validStatuses = ['active', 'completed', 'dropped', 'enrolled'];
+  const statusFilter = statusParam && validStatuses.includes(statusParam) ? statusParam : null;
+
+  // Query: Get programs joined with enrollments for this specific trainee (Req 2.9, 2.10)
+  // We need to fetch enrollments first, then join with program details
+  // This ensures we only get programs where this trainee has an enrollment
+  const { data: enrollmentsWithPrograms, error: enrollmentsError } = await supabaseAdmin
+    .from('enrollments')
+    .select(`
+      status,
+      programs (
+        id,
+        name,
+        description,
+        start_date,
+        end_date,
+        status,
+        instructor
+      )
+    `)
+    .eq('trainee_id', traineeId)
+    .eq('tenant_id', tenantId);
+
+  if (enrollmentsError) {
+    throw enrollmentsError;
+  }
+
+  // Transform and filter the results (Req 2.4, 2.5, 2.6, 2.7, 2.2, 2.3)
+  const filteredPrograms: ProgramResponse[] = (enrollmentsWithPrograms || [])
+    .filter((enrollment: any) => {
+      // Skip if program data is missing
+      if (!enrollment.programs) return false;
+
+      // Apply status filter if provided
+      if (statusFilter) {
+        return enrollment.status === statusFilter;
+      }
+
+      return true;
+    })
+    .map((enrollment: any) => {
+      const program = enrollment.programs;
+      return {
+        id: program.id,
+        name: program.name,
+        description: program.description || null,
+        start_date: program.start_date,
+        end_date: program.end_date,
+        status: program.status,
+        instructor: program.instructor || null,
+        enrollment_status: enrollment.status,
+      };
+    });
+
+  // Return response (Req 2.2, 2.3, 2.15, 5.6, 5.7)
+  // Empty array if trainee has no enrollments (Req 2.15)
+  return successResponse(filteredPrograms);
+});

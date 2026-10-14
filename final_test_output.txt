@@ -1,0 +1,320 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand --testPathPatterns=privilege-escalation
+PASS src/__tests__/api/privilege-escalation-logging.test.ts
+  ΓùÅ Console
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-ad'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result { tokenFound: true, tokenLength: 16, tokenPrefix: 'fake-token-admin' }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Attempting token extraction {
+        hasAuthHeader: true,
+        hasCookieHeader: false,
+        authHeaderPrefix: 'Bearer fake-token-tr'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:40:11)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      [getRequestToken] Token extraction result {
+        tokenFound: true,
+        tokenLength: 18,
+        tokenPrefix: 'fake-token-trainee'
+      }
+
+      at getRequestToken (src/middleware/auth.ts:51:11)
+          at Array.forEach (<anonymous>)
+
+PASS src/__tests__/security/privilege-escalation.test.ts
+
+Test Suites: 2 passed, 2 total
+Tests:       28 passed, 28 total
+Snapshots:   0 total
+Time:        2.469 s, estimated 3 s
+Ran all test suites matching privilege-escalation.

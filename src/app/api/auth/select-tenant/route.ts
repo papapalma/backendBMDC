@@ -1,0 +1,145 @@
+/**
+ * POST /api/auth/select-tenant
+ *
+ * Complete the multi-tenant login flow by selecting a specific tenant.
+ *
+ * Implements Requirements 6.6, 6.7:
+ *   - 6.6  Support multi-tenant login where users can belong to multiple tenants
+ *   - 6.7  Prompt for tenant selection after credential verification; generate
+ *          tenant-scoped JWT after selection
+ *
+ * This endpoint is called after /api/auth/login returns
+ * `requires_tenant_selection: true`. The client must provide:
+ *   - `selection_token`: the short-lived opaque token issued during login
+ *   - `tenant_id`: the UUID of the tenant the user selected
+ *
+ * On success a tenant-scoped JWT is generated and set as an httpOnly cookie,
+ * matching the same response shape as a direct single-tenant login.
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { unauthorizedResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { checkRateLimit, getRateLimitKey } from '@/utils/rateLimit';
+import { activityLogService } from '@/services/activityLogService';
+import { authRecoveryService } from '@/services/authRecoveryService';
+import { redeemTenantSelectionToken } from '@/services/multiTenantAuthService';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+// ---------------------------------------------------------------------------
+// Request schema
+// ---------------------------------------------------------------------------
+
+const selectTenantSchema = z.object({
+  selection_token: z
+    .string()
+    .min(1, 'selection_token is required')
+    .max(128, 'selection_token is too long'),
+  tenant_id: z
+    .string()
+    .uuid('tenant_id must be a valid UUID'),
+});
+
+// OPTIONS /api/auth/select-tenant — Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  // Rate limit: 10 attempts per IP per 15 minutes (same window as login)
+
+const rlResponse = checkRateLimit(getRateLimitKey(request, 'select-tenant'), {
+    limit: 10,
+    windowMs: 15 * 60 * 1000,
+  });
+  if (rlResponse) return rlResponse as NextResponse;
+
+  const body = await request.json();
+  const validatedData = selectTenantSchema.parse(body);
+
+  // ── Redeem the selection token ──────────────────────────────────────────
+  // This validates:
+  //   1. Token exists and has not expired (5-minute TTL)
+  //   2. The requested tenant_id is in the allowed set for this token
+  //   3. Token is consumed (one-time use) to prevent replay
+
+const result = redeemTenantSelectionToken(
+    validatedData.selection_token,
+    validatedData.tenant_id
+  );
+
+  if (!result) {
+    // Generic message — do not reveal whether the token or tenant was invalid
+
+return unauthorizedResponse(
+      'Invalid or expired selection token. Please log in again.'
+    );
+  }
+
+  // ── Fetch tenant name for the response ──────────────────────────────────
+
+const { data: tenant } = await supabaseAdmin
+    .from('tenants')
+    .select('id, name, status')
+    .eq('id', validatedData.tenant_id)
+    .single();
+
+  if (!tenant || tenant.status !== 'active') {
+    return forbiddenResponse(
+      'The selected tenant is not available. Please contact your administrator.'
+    );
+  }
+
+  // ── Fetch user details for the response ─────────────────────────────────
+
+const { data: user } = await supabaseAdmin
+    .from('users')
+    .select('id, email, username, role')
+    .eq('id', result.userId)
+    .single();
+
+  if (!user) {
+    return unauthorizedResponse('User not found');
+  }
+
+  // ── Issue refresh token ──────────────────────────────────────────────────
+
+const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    undefined;
+  const userAgent = request.headers.get('user-agent') || undefined;
+
+  const refresh = await authRecoveryService.issueRefreshToken(result.userId, { ip, userAgent });
+
+  // ── Log successful tenant selection ─────────────────────────────────────
+
+await activityLogService.logAction(result.userId, 'login', 'user', result.userId, undefined, undefined, validatedData.tenant_id);
+
+  const refreshTokenMaxAge =
+    Number(process.env.REFRESH_TOKEN_EXPIRES_DAYS || 14) * 24 * 60 * 60;
+
+  const response = NextResponse.json({
+    success: true,
+    data: {
+      token: result.token,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        tenantId: validatedData.tenant_id,
+        tenantName: tenant.name,
+      },
+    },
+    message: 'Login successful',
+  });
+
+  // NOTE: NO COOKIES SET - All tokens are returned in response body for session storage
+  // Frontend should store token and refreshToken in sessionStorage, not cookies
+
+  return response;
+});

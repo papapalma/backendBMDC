@@ -1,0 +1,1052 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand
+FAIL src/__tests__/integration/task8-full-integration.test.ts (21.155 s)
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 1. Database Layer Tests ΓÇ║ 1.1: qr_code column should be nullable
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      36 |   describe('1. Database Layer Tests', () => {
+      37 |     
+    > 38 |     it('1.1: qr_code column should be nullable', async () => {
+         |       ^
+      39 |       // SELECT query to verify column is nullable
+      40 |       const { data, error } = await supabase
+      41 |         .from('information_schema.columns')
+
+      at src/__tests__/integration/task8-full-integration.test.ts:38:7
+      at src/__tests__/integration/task8-full-integration.test.ts:36:11
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:30:9)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 1. Database Layer Tests ΓÇ║ 1.2: Trainees can be created without qr_code value
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      69 |
+      70 |       // Should succeed without error
+    > 71 |       expect(error).toBeNull();
+         |                     ^
+      72 |       expect(trainee).toBeDefined();
+      73 |       expect(trainee.id).toBeDefined();
+      74 |       expect(trainee.qr_code).toBeNull();
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:71:21)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 1. Database Layer Tests ΓÇ║ 1.3: Existing trainees with qr_code remain unchanged
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      102 |         .single();
+      103 |
+    > 104 |       expect(insertError).toBeNull();
+          |                           ^
+      105 |       expect(trainee?.qr_code).toBe(originalQrCode);
+      106 |
+      107 |       // Fetch and verify unchanged
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:104:27)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 2. Backend Registration Service Tests ΓÇ║ 2.1: Username should be stored during registration submission
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      164 |         .single();
+      165 |
+    > 166 |       expect(traineeError).toBeNull();
+          |                            ^
+      167 |       expect(trainee?.id).toBeDefined();
+      168 |       testTraineeId = trainee!.id;
+      169 |
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:166:28)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 2. Backend Registration Service Tests ΓÇ║ 2.2: Username should persist until approval
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      189 |     });
+      190 |
+    > 191 |     it('2.2: Username should persist until approval', async () => {
+          |       ^
+      192 |       // Fetch the stored username
+      193 |       const { data: pending } = await supabase
+      194 |         .from('pending_registration_usernames')
+
+      at src/__tests__/integration/task8-full-integration.test.ts:191:7
+      at src/__tests__/integration/task8-full-integration.test.ts:131:11
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:30:9)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 2. Backend Registration Service Tests ΓÇ║ 2.3: User account created with stored username during approval
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      200 |     });
+      201 |
+    > 202 |     it('2.3: User account created with stored username during approval', async () => {
+          |       ^
+      203 |       // Store password temporarily
+      204 |       const hashedPassword = 'hashed-test-password-' + Date.now();
+      205 |       await supabase
+
+      at src/__tests__/integration/task8-full-integration.test.ts:202:7
+      at src/__tests__/integration/task8-full-integration.test.ts:131:11
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:30:9)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 2. Backend Registration Service Tests ΓÇ║ 2.4: Pending username should be cleaned up after approval
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      243 |         .eq('trainee_id', testTraineeId);
+      244 |
+    > 245 |       expect(deleteError).toBeNull();
+          |                           ^
+      246 |
+      247 |       // Verify it's deleted
+      248 |       const { data: pending, error: fetchError } = await supabase
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:245:27)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 2. Backend Registration Service Tests ΓÇ║ 2.5: Fallback to email if pending username not found
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      290 |         .single();
+      291 |
+    > 292 |       expect(userError).toBeNull();
+          |                         ^
+      293 |       expect(user?.username).toBe(fallbackUsername);
+      294 |       
+      295 |       // Cleanup
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:292:25)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 3. Error Handling Tests ΓÇ║ 3.1: Database constraint - Duplicate email prevention
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      327 |         .single();
+      328 |
+    > 329 |       expect(error1).toBeNull();
+          |                      ^
+      330 |
+      331 |       // Try to insert duplicate (same email, same tenant)
+      332 |       const { data: trainee2, error: error2 } = await supabase
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:329:22)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 3. Error Handling Tests ΓÇ║ 3.2: Duplicate username prevention
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      368 |         .single();
+      369 |
+    > 370 |       expect(error1).toBeNull();
+          |                      ^
+      371 |
+      372 |       // Try to insert duplicate username
+      373 |       const { data: user2, error: error2 } = await supabase
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:370:22)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 3. Error Handling Tests ΓÇ║ 3.3: Duplicate pending username prevention
+
+    TypeError: Cannot read properties of null (reading 'id')
+
+      430 |         .from('pending_registration_usernames')
+      431 |         .insert({
+    > 432 |           trainee_id: trainee1!.id,
+          |                                 ^
+      433 |           username: dupUsername,
+      434 |         });
+      435 |
+
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:432:33)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 4. Data Persistence Tests ΓÇ║ 4.1: Complete trainee record should be created and persisted
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      503 |         .single();
+      504 |
+    > 505 |       expect(error).toBeNull();
+          |                     ^
+      506 |       expect(trainee?.id).toBeDefined();
+      507 |       expect(trainee?.email).toBe(email);
+      508 |       expect(trainee?.first_name).toBe('Persist');
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:505:21)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 4. Data Persistence Tests ΓÇ║ 4.2: User account should be created with correct data
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      536 |         .single();
+      537 |
+    > 538 |       expect(error).toBeNull();
+          |                     ^
+      539 |       expect(user?.username).toBe(username);
+      540 |       expect(user?.role).toBe('trainee');
+      541 |
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:538:21)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 4. Data Persistence Tests ΓÇ║ 4.3: User-Trainee association should be created
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      561 |         });
+      562 |
+    > 563 |       expect(error).toBeNull();
+          |                     ^
+      564 |
+      565 |       // Verify association
+      566 |       const { data: assoc } = await supabase
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:563:21)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 4. Data Persistence Tests ΓÇ║ 4.4: User-Tenant association should enable multi-tenant access
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      582 |         });
+      583 |
+    > 584 |       expect(error).toBeNull();
+          |                     ^
+      585 |
+      586 |       // Verify
+      587 |       const { data: utAssoc } = await supabase
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:584:21)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 5. Complete E2E Flow Verification ΓÇ║ 5.1: Should verify all tables exist and are accessible
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      614 |   describe('5. Complete E2E Flow Verification', () => {
+      615 |     
+    > 616 |     it('5.1: Should verify all tables exist and are accessible', async () => {
+          |       ^
+      617 |       // Check trainees table
+      618 |       const { data: traineesCheck, error: traineesError } = await supabase
+      619 |         .from('trainees')
+
+      at src/__tests__/integration/task8-full-integration.test.ts:616:7
+      at src/__tests__/integration/task8-full-integration.test.ts:614:11
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:30:9)
+
+  ΓùÅ Task 8: Full Integration Testing - Registration Flow ΓÇ║ 5. Complete E2E Flow Verification ΓÇ║ 5.2: Username flow - from registration through approval
+
+    expect(received).toBeNull()
+
+    Received: {"code": "", "details": "TypeError: fetch failed┬╖
+    Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)
+    Error: getaddrinfo ENOTFOUND test-project.supabase.co
+
+      669 |         .single();
+      670 |
+    > 671 |       expect(traineeError).toBeNull();
+          |                            ^
+      672 |       const traineeId = trainee!.id;
+      673 |
+      674 |       // Step 2: Store username
+
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)", "hint": "", "message": "TypeError: fetch failed"}
+      at Object.<anonymous> (src/__tests__/integration/task8-full-integration.test.ts:671:28)
+
+FAIL src/services/__tests__/tenant-isolation.properties.test.ts
+  ΓùÅ Tenant Isolation Enforcement - Property 12 (Requirements 2.1-2.15) ΓÇ║ Tenant ID Mismatch Detection - Requirements 2.1, 2.15 ΓÇ║ Property 7: Cross-tenant version access ALWAYS rejected
+
+    Property failed after 1 tests
+    { seed: -1365107895, path: "0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0", endOnFailure: true }
+    Counterexample: [["00000000-0000-1000-8000-000000000000","00000000-0000-1000-8000-000000000001"],"00000000-0000-1000-8000-000000000000"]
+    Shrunk 41 time(s)
+
+    Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+
+      at buildError (node_modules/fast-check/lib/cjs/fast-check.js:2477:16)
+      at asyncThrowIfFailed (node_modules/fast-check/lib/cjs/fast-check.js:2489:8)
+
+    Cause:
+    expect(received).rejects.toThrow(expected)
+
+    Expected constructor: TenantMismatchError
+    Received constructor: DatabaseError
+
+    Received message: "Unexpected error fetching version: supabase_admin_1.supabaseAdmin.from(...).select(...).eq(...).eq(...).maybeSingle is not a function"
+
+          436 |         throw error;
+          437 |       }
+        > 438 |       throw new DatabaseError(
+              |             ^
+          439 |         `Unexpected error fetching version: ${(error as Error).message}`
+          440 |       );
+          441 |     }
+
+      at CMSSettingsService.getVersionById (src/services/cms/CMSSettingsService.ts:438:13)
+      at src/services/__tests__/tenant-isolation.properties.test.ts:270:23
+      at AsyncProperty.predicate (node_modules/fast-check/lib/cjs/fast-check.js:1296:104)
+      at AsyncProperty.run (node_modules/fast-check/lib/cjs/fast-check.js:1232:30)
+      at asyncRunIt (node_modules/fast-check/lib/cjs/fast-check.js:2531:30)
+      at Object.<anonymous> (src/services/__tests__/tenant-isolation.properties.test.ts:250:7)
+      at Object.toThrow (node_modules/expect/build/index.js:2155:20)
+      at src/services/__tests__/tenant-isolation.properties.test.ts:271:23
+      at AsyncProperty.predicate (node_modules/fast-check/lib/cjs/fast-check.js:1296:104)
+      at AsyncProperty.run (node_modules/fast-check/lib/cjs/fast-check.js:1232:30)
+      at asyncRunIt (node_modules/fast-check/lib/cjs/fast-check.js:2531:30)
+      at Object.<anonymous> (src/services/__tests__/tenant-isolation.properties.test.ts:250:7)
+
+  ΓùÅ Tenant Isolation Enforcement - Property 12 (Requirements 2.1-2.15) ΓÇ║ All Operations Enforce Tenant Isolation - Requirements 2.1-2.15 ΓÇ║ Property 8: UPDATE operations enforce tenant_id matching
+
+    Property failed after 1 tests
+    { seed: -1672558210, path: "0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0", endOnFailure: true }
+    Counterexample: [["00000000-0000-1000-8000-000000000000","00000000-0000-1000-8000-000000000001"],"00000000-0000-1000-8000-000000000000",{"colors":{"primary":"#3B82F6","secondary":"#3B82F6"},"typography":{"headings":{"fontFamily":"Poppins","fontSize":{"h1":24,"h2":20}}}}]
+    Shrunk 21 time(s)
+
+    Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+
+      at buildError (node_modules/fast-check/lib/cjs/fast-check.js:2477:16)
+      at asyncThrowIfFailed (node_modules/fast-check/lib/cjs/fast-check.js:2489:8)
+
+    Cause:
+    DatabaseError: Unexpected error upserting CMS settings: supabase_admin_1.supabaseAdmin.from(...).upsert(...).select is not a function
+
+      318 |         throw error;
+      319 |       }
+    > 320 |       throw new DatabaseError(
+          |             ^
+      321 |         `Unexpected error upserting CMS settings: ${(error as Error).message}`
+      322 |       );
+      323 |     }
+
+      at CMSSettingsService.upsertSettings (src/services/cms/CMSSettingsService.ts:320:13)
+      at src/services/__tests__/tenant-isolation.properties.test.ts:311:13
+      at AsyncProperty.run (node_modules/fast-check/lib/cjs/fast-check.js:1232:19)
+      at asyncRunIt (node_modules/fast-check/lib/cjs/fast-check.js:2531:15)
+      at Object.<anonymous> (src/services/__tests__/tenant-isolation.properties.test.ts:289:7)
+
+  ΓùÅ Tenant Isolation Enforcement - Property 12 (Requirements 2.1-2.15) ΓÇ║ All Operations Enforce Tenant Isolation - Requirements 2.1-2.15 ΓÇ║ Property 9: ROLLBACK operations enforce tenant_id matching
+
+    Property failed after 1 tests
+    { seed: 1155717788, path: "0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0", endOnFailure: true }
+    Counterexample: [["00000000-0000-1000-8000-000000000000","00000000-0000-1000-8000-000000000001"],"00000000-0000-1000-8000-000000000000","00000000-0000-1000-8000-000000000000"]
+    Shrunk 18 time(s)
+
+    Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+
+      at buildError (node_modules/fast-check/lib/cjs/fast-check.js:2477:16)
+      at asyncThrowIfFailed (node_modules/fast-check/lib/cjs/fast-check.js:2489:8)
+
+    Cause:
+    expect(received).rejects.toThrow(expected)
+
+    Expected constructor: TenantMismatchError
+    Received constructor: DatabaseError
+
+    Received message: "Version not found or does not belong to this tenant"
+
+          477 |
+          478 |       if (!targetVersion) {
+        > 479 |         throw new DatabaseError('Version not found or does not belong to this tenant');
+              |               ^
+          480 |       }
+          481 |
+          482 |       // Step 2: Fetch current settings to get cms_settings_id
+
+      at CMSSettingsService.rollbackToVersion (src/services/cms/CMSSettingsService.ts:479:15)
+      at src/services/__tests__/tenant-isolation.properties.test.ts:347:13
+      at AsyncProperty.run (node_modules/fast-check/lib/cjs/fast-check.js:1232:19)
+      at asyncRunIt (node_modules/fast-check/lib/cjs/fast-check.js:2531:15)
+      at Object.<anonymous> (src/services/__tests__/tenant-isolation.properties.test.ts:325:7)
+      at Object.toThrow (node_modules/expect/build/index.js:2155:20)
+      at src/services/__tests__/tenant-isolation.properties.test.ts:349:23
+      at AsyncProperty.predicate (node_modules/fast-check/lib/cjs/fast-check.js:1296:104)
+      at AsyncProperty.run (node_modules/fast-check/lib/cjs/fast-check.js:1232:30)
+      at asyncRunIt (node_modules/fast-check/lib/cjs/fast-check.js:2531:30)
+      at Object.<anonymous> (src/services/__tests__/tenant-isolation.properties.test.ts:325:7)
+
+FAIL src/services/cms/__tests__/tenant-isolation.test.ts
+  ΓùÅ Test suite failed to run
+
+    TypeError: fast_check_1.default.hexaString is not a function
+
+      50 |   const settingsArb = fc.object({
+      51 |     colors: fc.object({
+    > 52 |       primary: fc.hexaString({ minLength: 7, maxLength: 7 }),
+         |                   ^
+      53 |       secondary: fc.hexaString({ minLength: 7, maxLength: 7 }),
+      54 |     }),
+      55 |   });
+
+      at src/services/cms/__tests__/tenant-isolation.test.ts:52:19
+      at Object.<anonymous> (src/services/cms/__tests__/tenant-isolation.test.ts:39:1)
+
+FAIL src/services/__tests__/enrollmentRequirementService.test.ts
+  ΓùÅ Test suite failed to run
+
+    Cannot find module 'vitest' from 'src/services/__tests__/enrollmentRequirementService.test.ts'
+
+       8 |  */
+       9 |
+    > 10 | import { describe, it, expect, beforeEach, vi } from 'vitest';
+         | ^
+      11 | import {
+      12 |   evaluateApplicabilityRules,
+      13 |   initializeEnrollmentRequirements,
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:895:11)
+      at Object.<anonymous> (src/services/__tests__/enrollmentRequirementService.test.ts:10:1)
+
+FAIL src/services/__tests__/cms-error-handling.comprehensive.test.ts
+  ΓùÅ Test suite failed to run
+
+    Configuration error:
+
+    Could not locate module @/lib/database mapped as:
+    C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\src\$1.
+
+    Please check your configuration for these entries:
+    {
+      "moduleNameMapper": {
+        "/^@\/(.*)$/": "C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\src\$1"
+      },
+      "resolver": undefined
+    }
+
+      36 |
+      37 | // Mock dependencies
+    > 38 | jest.mock('@/lib/database', () => ({
+         |      ^
+      39 |   query: jest.fn(),
+      40 |   queryOne: jest.fn(),
+      41 | }));
+
+      at createNoMappedModuleFoundError (node_modules/jest-resolve/build/index.js:1149:17)
+      at Object.<anonymous> (src/services/__tests__/cms-error-handling.comprehensive.test.ts:38:6)
+
+FAIL src/services/cms/CMSSettingsService.perf.test.ts
+  ΓùÅ Test suite failed to run
+
+    Cannot find module 'vitest' from 'src/services/cms/CMSSettingsService.perf.test.ts'
+
+      11 |  */
+      12 |
+    > 13 | import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+         | ^
+      14 | import { CMSSettingsService } from './CMSSettingsService';
+      15 | import * as db from '../../lib/db';
+      16 |
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:895:11)
+      at Object.<anonymous> (src/services/cms/CMSSettingsService.perf.test.ts:13:1)
+
+FAIL src/services/cms/__tests__/export-import.e2e.test.ts
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Export Flow ΓÇ║ should export complete settings with metadata successfully
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      173 |      */
+      174 |     it('should export complete settings with metadata successfully', async () => {
+    > 175 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+          |                                            ^
+      176 |       const mockInsert = jest.fn().mockResolvedValue({ data: null, error: null });
+      177 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      178 |         insert: mockInsert,
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:175:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Export Flow ΓÇ║ should include all customization categories in export
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      211 |
+      212 |     it('should include all customization categories in export', async () => {
+    > 213 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+          |                                            ^
+      214 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      215 |         insert: jest.fn().mockResolvedValue({ data: null, error: null }),
+      216 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:213:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Export Flow ΓÇ║ should reject export for non-existent settings
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      245 |
+      246 |     it('should reject export for non-existent settings', async () => {
+    > 247 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(null);
+          |                                            ^
+      248 |
+      249 |       await expect(
+      250 |         exportImportService.exportSettings(tenantA, adminA)
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:247:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Export Flow ΓÇ║ should reject export without valid tenant context
+
+    expect(received).rejects.toThrow(expected)
+
+    Expected constructor: TenantMismatchError
+
+    Received function did not throw
+
+      255 |       await expect(
+      256 |         exportImportService.exportSettings('', adminA)
+    > 257 |       ).rejects.toThrow(TenantMismatchError);
+          |                 ^
+      258 |
+      259 |       await expect(
+      260 |         exportImportService.exportSettings(null as any, adminA)
+
+      at Object.toThrow (node_modules/expect/build/index.js:2155:20)
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:257:17)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Export Flow ΓÇ║ should enforce tenant isolation in export
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      263 |
+      264 |     it('should enforce tenant isolation in export', async () => {
+    > 265 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+          |                                            ^
+      266 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      267 |         insert: jest.fn().mockResolvedValue({ data: null, error: null }),
+      268 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:265:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Import Flow ΓÇ║ should import valid file with overwrite strategy successfully
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      297 |       };
+      298 |
+    > 299 |       mockCMSService.validateImportFile.mockReturnValue({
+          |                                         ^
+      300 |         valid: true,
+      301 |         errors: [],
+      302 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:299:41)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Import Flow ΓÇ║ should validate import file structure before applying
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      342 |       };
+      343 |
+    > 344 |       mockCMSService.validateImportFile.mockReturnValue({
+          |                                         ^
+      345 |         valid: false,
+      346 |         errors: ['Invalid version', 'Missing settings'],
+      347 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:344:41)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Import Flow ΓÇ║ should validate settings after merge before applying
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      370 |       };
+      371 |
+    > 372 |       mockCMSService.validateImportFile.mockReturnValue({
+          |                                         ^
+      373 |         valid: true,
+      374 |         errors: [],
+      375 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:372:41)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Import Flow ΓÇ║ should reject import without valid tenant context
+
+    expect(received).rejects.toThrow(expected)
+
+    Expected constructor: TenantMismatchError
+
+    Received function did not throw
+
+      397 |       await expect(
+      398 |         exportImportService.importSettings('', exportedData, 'overwrite', adminA)
+    > 399 |       ).rejects.toThrow(TenantMismatchError);
+          |                 ^
+      400 |
+      401 |       await expect(
+      402 |         exportImportService.importSettings(null as any, exportedData, 'overwrite', adminA)
+
+      at Object.toThrow (node_modules/expect/build/index.js:2155:20)
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:399:17)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Import Flow ΓÇ║ should enforce tenant isolation in import
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      413 |       };
+      414 |
+    > 415 |       mockCMSService.validateImportFile.mockReturnValue({
+          |                                         ^
+      416 |         valid: true,
+      417 |         errors: [],
+      418 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:415:41)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Merge Strategies ΓÇ║ Overwrite Strategy ΓÇ║ should completely replace all settings with overwrite strategy
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      465 |         };
+      466 |
+    > 467 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      468 |           valid: true,
+      469 |           errors: [],
+      470 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:467:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Merge Strategies ΓÇ║ Merge Strategy ΓÇ║ should merge settings preserving unmodified fields with merge strategy
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      520 |         };
+      521 |
+    > 522 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      523 |           valid: true,
+      524 |           errors: [],
+      525 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:522:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Merge Strategies ΓÇ║ Merge Strategy ΓÇ║ should use imported settings when no current settings exist with merge strategy
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      586 |
+      587 |       it('should use imported settings when no current settings exist with merge strategy', async () => {
+    > 588 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      589 |           valid: true,
+      590 |           errors: [],
+      591 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:588:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Export-Import Idempotence ΓÇ║ should preserve all settings through export-import cycle with overwrite
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      634 |     it('should preserve all settings through export-import cycle with overwrite', async () => {
+      635 |       // Step 1: Export settings
+    > 636 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+          |                                            ^
+      637 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      638 |         insert: jest.fn().mockResolvedValue({ data: null, error: null }),
+      639 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:636:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Export-Import Idempotence ΓÇ║ should preserve settings through multiple export-import cycles
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      674 |     it('should preserve settings through multiple export-import cycles', async () => {
+      675 |       // First cycle
+    > 676 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+          |                                            ^
+      677 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      678 |         insert: jest.fn().mockResolvedValue({ data: null, error: null }),
+      679 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:676:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Export-Import Idempotence ΓÇ║ should preserve complex nested structures through export-import
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      763 |       };
+      764 |
+    > 765 |       mockCMSService.getSettingsByTenantId.mockResolvedValue({
+          |                                            ^
+      766 |         ...tenantASettings,
+      767 |         settings_data: complexSettings,
+      768 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:765:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Error Scenarios ΓÇ║ Malformed Import Files ΓÇ║ should reject import with null settings object
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      815 |         };
+      816 |
+    > 817 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      818 |           valid: false,
+      819 |           errors: ['Settings must be an object'],
+      820 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:817:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Error Scenarios ΓÇ║ Malformed Import Files ΓÇ║ should reject import with undefined settings
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      831 |         };
+      832 |
+    > 833 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      834 |           valid: false,
+      835 |           errors: ['Settings field required'],
+      836 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:833:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Error Scenarios ΓÇ║ Malformed Import Files ΓÇ║ should reject import with wrong version
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      847 |         };
+      848 |
+    > 849 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      850 |           valid: true,
+      851 |           errors: [],
+      852 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:849:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Error Scenarios ΓÇ║ Malformed Import Files ΓÇ║ should reject import missing version field
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      865 |         };
+      866 |
+    > 867 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      868 |           valid: true,
+      869 |           errors: [],
+      870 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:867:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Error Scenarios ΓÇ║ Invalid Data in Import ΓÇ║ should reject import with invalid color values
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      891 |         };
+      892 |
+    > 893 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      894 |           valid: true,
+      895 |           errors: [],
+      896 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:893:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Error Scenarios ΓÇ║ Invalid Data in Import ΓÇ║ should reject import with invalid numeric spacing values
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      918 |         };
+      919 |
+    > 920 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      921 |           valid: true,
+      922 |           errors: [],
+      923 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:920:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Error Scenarios ΓÇ║ Invalid Data in Import ΓÇ║ should reject import with invalid font size
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      945 |         };
+      946 |
+    > 947 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      948 |           valid: true,
+      949 |           errors: [],
+      950 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:947:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Error Scenarios ΓÇ║ Merge Conflicts ΓÇ║ should handle merge when imported data conflicts with current
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      972 |         };
+      973 |
+    > 974 |         mockCMSService.validateImportFile.mockReturnValue({
+          |                                           ^
+      975 |           valid: true,
+      976 |           errors: [],
+      977 |         });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:974:43)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Audit Logging ΓÇ║ should create audit log for export action with correct metadata
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      1025 |      */
+      1026 |     it('should create audit log for export action with correct metadata', async () => {
+    > 1027 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+           |                                            ^
+      1028 |       const mockInsert = jest.fn().mockResolvedValue({ data: null, error: null });
+      1029 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      1030 |         insert: mockInsert,
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1027:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Audit Logging ΓÇ║ should create audit log for import action with merge strategy
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      1057 |       };
+      1058 |
+    > 1059 |       mockCMSService.validateImportFile.mockReturnValue({
+           |                                         ^
+      1060 |         valid: true,
+      1061 |         errors: [],
+      1062 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1059:41)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Audit Logging ΓÇ║ should record separate audit logs for each export/import action
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      1090 |
+      1091 |     it('should record separate audit logs for each export/import action', async () => {
+    > 1092 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+           |                                            ^
+      1093 |       const mockInsert = jest.fn().mockResolvedValue({ data: null, error: null });
+      1094 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      1095 |         insert: mockInsert,
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1092:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Audit Logging ΓÇ║ should include merge strategy details in import audit log
+
+    TypeError: Cannot read properties of undefined (reading 'mockReturnValue')
+
+      1121 |       };
+      1122 |
+    > 1123 |       mockCMSService.validateImportFile.mockReturnValue({
+           |                                         ^
+      1124 |         valid: true,
+      1125 |         errors: [],
+      1126 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1123:41)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Audit Logging ΓÇ║ should continue operation even if audit log fails
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      1148 |
+      1149 |     it('should continue operation even if audit log fails', async () => {
+    > 1150 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+           |                                            ^
+      1151 |       const mockInsert = jest.fn().mockRejectedValue(new Error('Audit service down'));
+      1152 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      1153 |         insert: mockInsert,
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1150:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Tenant Isolation Throughout Workflow ΓÇ║ should maintain tenant isolation across complete export-import cycle
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      1168 |     it('should maintain tenant isolation across complete export-import cycle', async () => {
+      1169 |       // Tenant A exports
+    > 1170 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+           |                                            ^
+      1171 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      1172 |         insert: jest.fn().mockResolvedValue({ data: null, error: null }),
+      1173 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1170:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Tenant Isolation Throughout Workflow ΓÇ║ should reject export without valid tenant context
+
+    expect(received).rejects.toThrow(expected)
+
+    Expected constructor: TenantMismatchError
+
+    Received function did not throw
+
+      1211 |       await expect(
+      1212 |         exportImportService.exportSettings('', adminA)
+    > 1213 |       ).rejects.toThrow(TenantMismatchError);
+           |                 ^
+      1214 |
+      1215 |       await expect(
+      1216 |         exportImportService.exportSettings(null as any, adminA)
+
+      at Object.toThrow (node_modules/expect/build/index.js:2155:20)
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1213:17)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Tenant Isolation Throughout Workflow ΓÇ║ should reject import without valid tenant context
+
+    expect(received).rejects.toThrow(expected)
+
+    Expected constructor: TenantMismatchError
+
+    Received function did not throw
+
+      1229 |       await expect(
+      1230 |         exportImportService.importSettings('', exportData, 'overwrite', adminA)
+    > 1231 |       ).rejects.toThrow(TenantMismatchError);
+           |                 ^
+      1232 |
+      1233 |       await expect(
+      1234 |         exportImportService.importSettings(null as any, exportData, 'overwrite', adminA)
+
+      at Object.toThrow (node_modules/expect/build/index.js:2155:20)
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1231:17)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Tenant Isolation Throughout Workflow ΓÇ║ should validate admin context in all operations
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      1237 |
+      1238 |     it('should validate admin context in all operations', async () => {
+    > 1239 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+           |                                            ^
+      1240 |
+      1241 |       await expect(
+      1242 |         exportImportService.exportSettings(tenantA, '')
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1239:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Tenant Isolation Throughout Workflow ΓÇ║ should include tenant_id and admin_id in all audit logs
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      1249 |
+      1250 |     it('should include tenant_id and admin_id in all audit logs', async () => {
+    > 1251 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+           |                                            ^
+      1252 |       const mockInsert = jest.fn().mockResolvedValue({ data: null, error: null });
+      1253 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      1254 |         insert: mockInsert,
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1251:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Workflow Scenarios ΓÇ║ Scenario 1: Admin exports current theme, modifies on test server, reimports
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      1270 |     it('Scenario 1: Admin exports current theme, modifies on test server, reimports', async () => {
+      1271 |       // Step 1: Export current theme
+    > 1272 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+           |                                            ^
+      1273 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      1274 |         insert: jest.fn().mockResolvedValue({ data: null, error: null }),
+      1275 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1272:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Workflow Scenarios ΓÇ║ Scenario 2: Admin shares export with another admin who imports it
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      1332 |     it('Scenario 2: Admin shares export with another admin who imports it', async () => {
+      1333 |       // Admin A exports theme
+    > 1334 |       mockCMSService.getSettingsByTenantId.mockResolvedValue(tenantASettings);
+           |                                            ^
+      1335 |       (supabaseAdmin.from as jest.Mock).mockReturnValue({
+      1336 |         insert: jest.fn().mockResolvedValue({ data: null, error: null }),
+      1337 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1334:44)
+
+  ΓùÅ Export/Import End-to-End Tests ΓÇ║ E2E: Complete Workflow Scenarios ΓÇ║ Scenario 3: Emergency recovery - export good backup, import to replace broken theme
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      1377 |
+      1378 |       // Step 2: Current settings are broken (invalid)
+    > 1379 |       mockCMSService.getSettingsByTenantId.mockResolvedValue({
+           |                                            ^
+      1380 |         ...tenantASettings,
+      1381 |         settings_data: { colors: { primary: 'invalid' } }, // Broken
+      1382 |       });
+
+      at Object.<anonymous> (src/services/cms/__tests__/export-import.e2e.test.ts:1379:44)
+
+C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\node_modules\expect\build\index.js:2155
+  const innerErr = new JestAssertionError();
+                   ^
+
+[JestAssertionError: expect(received).rejects.toThrow()
+
+Received function did not throw] {
+  matcherResult: {
+    message: 'expect(received).rejects.toThrow()\n\nReceived function did not throw',
+    pass: false
+  }
+}
+
+Node.js v24.18.0

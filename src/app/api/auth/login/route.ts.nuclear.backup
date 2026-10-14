@@ -1,0 +1,207 @@
+﻿/**
+ * POST /api/auth/login
+ *
+ * Multi-tenant login endpoint.
+ *
+ * Implements Requirements 6.1, 6.2, 6.6, 6.7:
+ *   - 6.1  Verify credentials against the users table
+ *   - 6.2  Determine the user's tenant association after authentication
+ *   - 6.6  Support multi-tenant login (users belonging to multiple tenants)
+ *   - 6.7  Prompt for tenant selection when user belongs to multiple tenants
+ *
+ * Flow:
+ *   1. Validate request body (email + password).
+ *   2. Look up user by email in the users table.
+ *   3. Verify password hash.
+ *   4. Query users_tenants junction table for tenant associations.
+ *   5a. Single tenant  → generate tenant-scoped JWT, set cookie, return user data.
+ *   5b. Multiple tenants → issue a short-lived selection token, return tenant list
+ *       so the client can display a tenant picker (no cookie set yet).
+ *   5c. No tenants → return 403 (account not associated with any active tenant).
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { comparePassword } from '@/lib/auth';
+import { setAuthCookie } from '@/lib/auth/jwt';
+import { loginSchema } from '@/utils/validators';
+import { unauthorizedResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { activityLogService } from '@/services/activityLogService';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { checkRateLimit, getRateLimitKey } from '@/utils/rateLimit';
+import { authRecoveryService } from '@/services/authRecoveryService';
+import {
+  getUserTenants,
+  issueTenantSelectionToken,
+  generateTenantScopedToken,
+} from '@/services/multiTenantAuthService';
+
+// OPTIONS /api/auth/login — Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  // Rate limit: 50 attempts per IP per 15 minutes (increased for development)
+  const rlResponse = checkRateLimit(getRateLimitKey(request, 'login'), {
+    limit: 50,
+    windowMs: 15 * 60 * 1000,
+  });
+  if (rlResponse) return rlResponse as NextResponse;
+
+  const body = await request.json();
+  const validatedData = loginSchema.parse(body);
+
+  // ── Step 1: Find user by email ──────────────────────────────────────────
+  const { data: user, error } = await supabaseAdmin
+    .from('users')
+    .select('id, email, username, role, password_hash')
+    .eq('email', validatedData.email)
+    .single();
+
+  if (error || !user) {
+    // Generic message — do not reveal whether email exists (Req 6.9)
+    return unauthorizedResponse('Invalid email or password');
+  }
+
+  // ── Step 2: Verify password ─────────────────────────────────────────────
+  const isPasswordValid = await comparePassword(
+    validatedData.password,
+    user.password_hash
+  );
+
+  if (!isPasswordValid) {
+    return unauthorizedResponse('Invalid email or password');
+  }
+
+  // ── Step 3: Determine tenant associations (Req 6.2) ─────────────────────
+  const tenants = await getUserTenants(user.id);
+
+  // ── Step 4: Handle no-tenant case ───────────────────────────────────────
+  if (tenants.length === 0) {
+    // Super admins may not have a tenant association — handle separately.
+    // For all other roles, deny access if no active tenant is found.
+    if (user.role === 'super_admin') {
+      // Super admins use a platform-wide sentinel tenant ID so the JWT
+      // payload always carries a tenantId field (design requirement).
+      const SUPER_ADMIN_TENANT_ID = 'platform';
+      const token = generateTenantScopedToken(
+        user.id,
+        user.email,
+        user.role,
+        SUPER_ADMIN_TENANT_ID
+      );
+
+      return buildLoginResponse(request, user, token, SUPER_ADMIN_TENANT_ID, null);
+    }
+
+    return forbiddenResponse(
+      'Your account is not associated with any active tenant. Please contact your administrator.'
+    );
+  }
+
+  // ── Step 5a: Single tenant — complete login immediately (Req 6.2) ───────
+  if (tenants.length === 1) {
+    const tenant = tenants[0];
+    const token = generateTenantScopedToken(
+      user.id,
+      user.email,
+      user.role,
+      tenant.id
+    );
+
+    return buildLoginResponse(request, user, token, tenant.id, tenant.name);
+  }
+
+  // ── Step 5b: Multiple tenants — prompt for selection (Req 6.6, 6.7) ────
+  const selectionToken = issueTenantSelectionToken(
+    user.id,
+    user.email,
+    user.role,
+    tenants
+  );
+
+  // Log the partial authentication event
+  // For tenant selection, use null/undefined as tenantId since no specific tenant is selected yet
+  await activityLogService.logAction(user.id, 'login_tenant_selection_required', 'user', user.id, undefined, undefined, undefined);
+
+  return NextResponse.json({
+    success: true,
+    data: {
+      requires_tenant_selection: true,
+      selection_token: selectionToken,
+      tenants: tenants.map((t) => ({
+        id: t.id,
+        name: t.name,
+        is_primary: t.is_primary,
+      })),
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+      },
+    },
+    message: 'Please select a tenant to continue',
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Helper: build the final authenticated response with cookies
+// ---------------------------------------------------------------------------
+
+async function buildLoginResponse(
+  request: NextRequest,
+  user: { id: string; email: string; username: string; role: string },
+  token: string,
+  tenantId: string,
+  tenantName: string | null
+): Promise<NextResponse> {
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    undefined;
+  const userAgent = request.headers.get('user-agent') || undefined;
+
+  // Issue refresh token
+  const refresh = await authRecoveryService.issueRefreshToken(user.id, { ip, userAgent });
+
+  // Log successful login
+  await activityLogService.logAction(user.id, 'login', 'user', user.id, undefined, undefined, tenantId === 'platform' ? undefined : tenantId);
+
+  const refreshTokenMaxAge =
+    Number(process.env.REFRESH_TOKEN_EXPIRES_DAYS || 14) * 24 * 60 * 60;
+
+  const response = NextResponse.json({
+    success: true,
+    data: {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        tenantId,
+        ...(tenantName ? { tenantName } : {}),
+      },
+    },
+    message: 'Login successful',
+  });
+
+  // Set auth_token cookie (httpOnly, SameSite=Strict per Req 6.8)
+  setAuthCookie(response, token);
+
+  // Set refresh token cookie
+  const isProduction = process.env.NODE_ENV === 'production';
+  response.cookies.set('refresh_token', refresh.token, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'strict' : 'lax',
+    maxAge: refreshTokenMaxAge,
+    path: '/',
+  });
+
+  return response;
+}

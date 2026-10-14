@@ -1,0 +1,121 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand trainee-authorization
+  console.log
+    [2026-10-06T02:59:15.624Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      durationMs: 2,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+  console.log
+    [2026-10-06T02:59:15.643Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=bbbbbbbb-cccc-dddd-eeee-ffffffffffff',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+  console.log
+    [2026-10-06T02:59:15.645Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?session_id=session-123&program_id=program-1&date=2024-01-15',
+      durationMs: 1,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+  console.log
+    [2026-10-06T02:59:15.646Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?session_id=session-456&program_id=tenant-b-program-1&date=2024-01-15',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+  console.log
+    [2026-10-06T02:59:15.647Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=bbbbbbbb-cccc-dddd-eeee-ffffffffffff',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+  console.log
+    [2026-10-06T02:59:15.649Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?session_id=session-999&program_id=tenant-b-program&date=2024-01-15',
+      durationMs: 1,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+  console.log
+    [2026-10-06T02:59:15.649Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=not-a-uuid',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+  console.log
+    [2026-10-06T02:59:15.650Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+  console.log
+    [2026-10-06T02:59:15.651Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+  console.log
+    [2026-10-06T02:59:15.652Z] [INFO] [REQUEST_OBSERVABILITY] Request completed {
+      method: 'GET',
+      url: 'http://localhost:3000/api/attendance?trainee_id=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      durationMs: 0,
+      status: 'success'
+    }
+
+      at Logger.log (src/utils/logger.ts:23:17)
+
+PASS src/__tests__/api/trainee-authorization.test.ts
+  GET /api/attendance - Trainee Authorization
+    ΓêÜ Test 1: should allow trainee to fetch their own attendance records (21 ms)
+    ΓêÜ Test 2: should deny trainee attempting to fetch another trainees attendance (1 ms)
+    ΓêÜ Test 3: should allow staff to fetch attendance for their tenant trainees (2 ms)
+    ΓêÜ Test 4: should deny staff attempting to access attendance from different tenant
+    ΓêÜ Test 5: should log access denial when trainee tries to fetch other trainee data (1 ms)
+    ΓêÜ Test 6: should log access denial when staff tries cross-tenant access (1 ms)
+  GET /api/attendance - Edge Cases
+    ΓêÜ Test 7: should return 400 when trainee_id is not a valid UUID (1 ms)
+    ΓêÜ Test 8: should return 400 when tenant context is missing (1 ms)
+    ΓêÜ Test 9: should require trainee to specify trainee_id in query
+    ΓêÜ Test 10: should handle case where trainee resolution returns null (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        0.396 s, estimated 1 s
+Ran all test suites matching trainee-authorization.

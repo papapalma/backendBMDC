@@ -1,0 +1,8 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand jwt-token-refresh-strategy
+SyntaxError: Invalid regular expression: /\\node_modules\\|\\.next\\|**\\*.perf.test.ts|**\\*.properties.test.ts/: Nothing to repeat
+    at new RegExp (<anonymous>)
+    at new SearchSource (C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\node_modules\@jest\core\build\index.js:444:39)
+    at C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\node_modules\@jest\core\build\index.js:3396:49
+    at Array.map (<anonymous>)
+    at runJest (C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\node_modules\@jest\core\build\index.js:3396:34)

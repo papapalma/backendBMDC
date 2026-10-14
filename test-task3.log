@@ -1,0 +1,38 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand cross-tenant-isolation
+PASS src/__tests__/api/cross-tenant-isolation.test.ts
+  Cross-Tenant File Isolation
+    pathBelongsToTenant
+      ΓêÜ should return true when file path contains matching tenant_id (1 ms)
+      ΓêÜ should return false when file path contains different tenant_id
+      ΓêÜ should return false when tenant_id is missing from path (1 ms)
+      ΓêÜ should be case-insensitive for tenant_id matching
+      ΓêÜ should handle Windows-style path separators
+      ΓêÜ should reject path traversal attempts in filename
+    extractTenantIdFromPath
+      ΓêÜ should extract tenant_id from valid file path
+      ΓêÜ should return null for invalid UUID
+      ΓêÜ should return null for missing tenant_id (1 ms)
+      ΓêÜ should handle Windows-style separators
+      ΓêÜ should handle mixed separators
+      ΓêÜ should handle encoded slashes in filename
+    File Access Guard - Tenant Boundary Validation
+      ΓêÜ should validate that file.file_path includes authenticating user tenant_id
+      ΓêÜ should reject access when file tenant does not match user tenant
+      ΓêÜ should handle encoded tenant_ids in comparison
+      ΓêÜ should reject path traversal in file responses
+    Query Result Filtering - Ensures RLS by tenant_id
+      ΓêÜ should verify that Supabase queries include .eq(tenant_id) filter
+      ΓêÜ should always apply tenant boundary check AFTER query result
+    validateFileAccess - File Access Guard Function
+      ΓêÜ should allow access when file path matches tenant_id (96 ms)
+      ΓêÜ should deny access when file path does not match tenant_id
+      ΓêÜ should deny access when file is null
+      ΓêÜ should deny access when file has no file_path
+      ΓêÜ should deny access when tenant_id is missing
+
+Test Suites: 1 passed, 1 total
+Tests:       23 passed, 23 total
+Snapshots:   0 total
+Time:        0.451 s, estimated 1 s
+Ran all test suites matching cross-tenant-isolation.

@@ -1,0 +1,73 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { traineeService } from '@/services/traineeService';
+import { programService } from '@/services/programService';
+import { requireRoleAsync } from '@/middleware/auth';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { createCsvDownloadResponse, objectsToCsv } from '@/utils/export';
+
+// OPTIONS /api/trainees/export - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/trainees/export - Export trainees as CSV
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['local_admin', 'staff_training_coordinator', 'staff_inventory_manager']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+  
+  const user = authResult.user;
+  const context = {
+  userId: user.userId,
+  tenantId: user.tenantId,
+  role: user.role,
+  isSuperAdmin: user.role === 'super_admin',
+  };
+
+  const { searchParams } = new URL(request.url);
+  const program_id = searchParams.get('program_id') || searchParams.get('program') || undefined;
+  const status = searchParams.get('status') || undefined;
+  const search = searchParams.get('search') || undefined;
+
+  // Pass full context to service (Task 3.3: Services need isSuperAdmin flag)
+  const [trainees, programs] = await Promise.all([
+  traineeService.getAllTrainees(context, { program_id, status, search }),
+  programService.getAllPrograms(),
+  ]);
+
+  const programNameById = new Map(programs.map((program) => [program.id, program.name]));
+
+  const rows = trainees.map((trainee) => ({
+  id: trainee.id,
+  last_name: trainee.last_name,
+  first_name: trainee.first_name,
+  middle_name: trainee.middle_name,
+  email: trainee.email,
+  phone: trainee.phone,
+  sex: trainee.sex,
+  program: programNameById.get(trainee.program_id) || '',
+  status: trainee.status,
+  enrollment_date: trainee.enrollment_date,
+  municipality: trainee.municipality,
+  province: trainee.province,
+  }));
+
+  const csv = objectsToCsv(rows, [
+  'id',
+  'last_name',
+  'first_name',
+  'middle_name',
+  'email',
+  'phone',
+  'sex',
+  'program',
+  'status',
+  'enrollment_date',
+  'municipality',
+  'province',
+  ]);
+
+  return createCsvDownloadResponse(csv, 'trainees-export.csv');
+});

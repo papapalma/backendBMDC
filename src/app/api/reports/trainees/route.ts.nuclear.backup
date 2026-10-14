@@ -1,0 +1,57 @@
+﻿/** * GET /api/reports/trainees — trainee analytics (tenant-scoped, Req 4.6) * * Updated to enforce tenant context so each LGU only sees its own trainees. */import { NextRequest, NextResponse } from 'next/server';
+
+import { requireTenantContext } from '@/middleware/tenantContext';
+
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+
+import { withErrorHandler } from '@/middleware/errorHandler';
+
+import { handleOptionsRequest } from '@/middleware/cors';
+
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+// OPTIONS /api/reports/trainees - Handle CORS preflightexport async function OPTIONS(request: NextRequest) { return handleOptionsRequest(request);}// GET /api/reports/trainees - Get trainee analytics report (tenant-scoped)export const GET = withErrorHandler(async (request: NextRequest) => { const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, role, isSuperAdmin } = ctxResult.context;
+
+  const allowedRoles = [  'local_admin',  'staff_training_coordinator',  ];
+  if (!allowedRoles.includes(role) && !isSuperAdmin) { return forbiddenResponse('Insufficient permissions to view trainee reports');
+}
+
+const { searchParams } = new URL(request.url);
+
+  const startDate  = searchParams.get('startDate') || searchParams.get('start_date') || undefined;
+  const endDate  = searchParams.get('endDate')  || searchParams.get('end_date')  || undefined;
+
+  const programId  = searchParams.get('program')  || searchParams.get('program_id') || undefined;
+  const status  = searchParams.get('status') || undefined;
+
+  const targetTenantId = isSuperAdmin  ? (searchParams.get('tenant_id') || tenantId)  : tenantId;  let traineesQuery = supabaseAdmin  .from('trainees')  .select('id, program_id, status, enrollment_date, created_at')  .eq('tenant_id', targetTenantId);
+  if (programId) traineesQuery = traineesQuery.eq('program_id', programId);
+  if (status)  traineesQuery = traineesQuery.eq('status', status);
+  if (startDate) traineesQuery = traineesQuery.gte('enrollment_date', startDate);
+  if (endDate)  traineesQuery = traineesQuery.lte('enrollment_date', endDate);
+
+  const [{ data: trainees, error: traineesError }, { data: programs, error: programsError }] = await Promise.all([  traineesQuery.order('enrollment_date', { ascending: true }),  supabaseAdmin.from('programs').select('id, name').eq('tenant_id', targetTenantId),  ]);
+  if (traineesError) throw traineesError;
+  if (programsError) throw programsError;
+
+  const traineeRows = trainees || [];
+  const programRows = programs || [];
+
+  const programNameById = new Map(programRows.map((p) => [p.id as string, p.name as string]));
+  const byProgram: { [key: string]: number } = {};
+
+  const byStatus: { [key: string]: number } = {};
+  const trendMap: { [key: string]: number } = {};  for (const trainee of traineeRows) { const programName: string = (programNameById.get(trainee.program_id as string) as string) || 'Unknown Program';  byProgram[programName] = (byProgram[programName] ?? 0) + 1;
+
+  const statusStr: string = String(trainee.status);  byStatus[statusStr] = (byStatus[statusStr] ?? 0) + 1;
+
+  const dateKey: string = (trainee.enrollment_date || trainee.created_at || '').split('T')[0] || 'unknown';  trendMap[dateKey] = (trendMap[dateKey] ?? 0) + 1;  }
+
+const enrollmentTrend = Object.entries(trendMap)  .filter(([date]) => date !== 'unknown')  .sort(([a], [b]) => a.localeCompare(b))  .map(([date, count]) => ({ date, count }));
+  const completedCount = byStatus.completed || 0;
+
+  const completionRate = traineeRows.length > 0  ? Number(((completedCount / traineeRows.length) * 100).toFixed(2))  : 0;
+  return successResponse({ tenantId: targetTenantId,  totalTrainees: traineeRows.length,  byProgram,  byStatus,  enrollmentTrend,  completionRate,  });});

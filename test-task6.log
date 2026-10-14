@@ -1,0 +1,33 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand rate-limiting
+PASS src/__tests__/api/rate-limiting.test.ts
+  Rate Limiting - checkRateLimit utility
+    ΓêÜ Test 1: should allow 5 submissions within the rate limit window (1 ms)
+    ΓêÜ Test 2: should return 429 when request exceeds rate limit (5 ms)
+    ΓêÜ Test 3: should include Retry-After header in 429 response (1 ms)
+    ΓêÜ Test 4: should track rate limits independently per user/key
+    ΓêÜ Test 5: should reset limit after window expires (213 ms)
+    ΓêÜ Test 6: should enforce attendance submission rate limit (5 per hour) (1 ms)
+    ΓêÜ Test 7: should enforce file upload rate limit (10 per hour)
+    ΓêÜ Test 8: should return JSON response with correct Content-Type (1 ms)
+    ΓêÜ Test 9: should include error message in 429 response body (1 ms)
+    ΓêÜ Test 10: should maintain independent limits across tenants
+    ΓêÜ Test 11: should extract rate limit key from request with x-forwarded-for header
+    ΓêÜ Test 12: should calculate accurate Retry-After time
+  Rate Limiting - Key Prefix Isolation
+    ΓêÜ Test 13: should maintain separate limits for different action prefixes (1 ms)
+    ΓêÜ Test 14: should support login attempt rate limiting (e.g., 5 failures per 15 min) (1 ms)
+    ΓêÜ Test 15: should support OTP/verify code rate limiting (e.g., 5 per 5 min)
+  Rate Limiting - Edge Cases
+    ΓêÜ Test 16: should handle large limits (e.g., 1000 requests per hour) (29 ms)
+    ΓêÜ Test 17: should handle short rate limit windows (212 ms)
+    ΓêÜ Test 18: should handle unusual keys gracefully
+
+Test Suites: 1 passed, 1 total
+Tests:       18 passed, 18 total
+Snapshots:   0 total
+Time:        0.795 s, estimated 1 s
+Ran all test suites matching rate-limiting.
+Jest did not exit one second after the test run has completed.
+
+'This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue.

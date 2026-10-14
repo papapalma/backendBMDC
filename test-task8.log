@@ -1,0 +1,70 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand compression-bomb
+PASS src/__tests__/security/compression-bomb.test.ts
+  Compression Bomb Detection
+    detectArchiveFormat
+      ΓêÜ should detect ZIP format by magic bytes (PK..) (1 ms)
+      ΓêÜ should detect GZIP format by magic bytes (..)
+      ΓêÜ should detect BZIP2 format by magic bytes (BZ)
+      ΓêÜ should detect 7Z format by magic bytes (1 ms)
+      ΓêÜ should detect RAR format by magic bytes (Rar!)
+      ΓêÜ should detect tar.gz format from filename
+      ΓêÜ should return unknown for non-archive data (1 ms)
+      ΓêÜ should handle empty buffer gracefully
+      ΓêÜ should handle small buffer (< magic byte length)
+    Normal files (should be accepted)
+      ΓêÜ should accept normal JPEG image (1 ms)
+      ΓêÜ should accept normal PNG image (1 ms)
+      ΓêÜ should accept normal document file (2 ms)
+      ΓêÜ should accept small text file
+      ΓêÜ should accept legitimate ZIP with low compression ratio
+      ΓêÜ should accept normal gzip with reasonable compression ratio (8 ms)
+    Compression bombs (should be rejected)
+      ΓêÜ should reject compression bomb with extreme ratio (5 ms)
+      ΓêÜ should reject file with compression ratio > 100:1 (1 ms)
+      ΓêÜ should reject file with uncompressed size > 500 MB (501 ms)
+      ΓêÜ should reject ZIP with high compression ratio (3 ms)
+      ΓêÜ should reject file marked as bomb-like in filename (1 ms)
+    Boundary cases
+      ΓêÜ should accept file exactly at 500 MB uncompressed size (180 ms)
+      ΓêÜ should reject file exceeding 500 MB uncompressed size (478 ms)
+      ΓêÜ should accept file exactly at 100:1 compression ratio (2 ms)
+      ΓêÜ should reject file exceeding 100:1 compression ratio (1 ms)
+      ΓêÜ should handle empty file
+      ΓêÜ should handle very small file (1 byte)
+    Various archive formats
+      ΓêÜ should handle ZIP format
+      ΓêÜ should handle tar.gz format (by filename) (1 ms)
+      ΓêÜ should handle 7z format
+      ΓêÜ should handle RAR format (1 ms)
+    detectCompressionBombSync (synchronous ZIP-only)
+      ΓêÜ should detect normal ZIP synchronously (1 ms)
+      ΓêÜ should return synchronously (no promise)
+      ΓêÜ should handle non-ZIP gracefully
+    Return value validation
+      ΓêÜ should always return isBomb boolean (1 ms)
+      ΓêÜ should include compressedSize in result
+      ΓêÜ should include reason when isBomb is true (4 ms)
+      ΓêÜ should not include reason when isBomb is false
+      ΓêÜ should include format when detected (1 ms)
+      ΓêÜ should include ratio when calculable (1 ms)
+    Error handling
+      ΓêÜ should not throw on large buffer (25 ms)
+      ΓêÜ should handle corrupted ZIP gracefully (1 ms)
+      ΓêÜ should handle invalid MIME type (1 ms)
+      ΓêÜ should handle undefined MIME type
+      ΓêÜ should handle undefined filename (1 ms)
+    Performance
+      ΓêÜ should complete detection within 5 seconds (3 ms)
+      ΓêÜ synchronous detection should complete quickly (1 ms)
+    Integration
+      ΓêÜ should detect compression bombs before file is fully decompressed (3 ms)
+      ΓêÜ should provide actionable error messages (4 ms)
+      ΓêÜ should work with file upload flow
+      ΓêÜ should catch bombs during upload validation (3 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       50 passed, 50 total
+Snapshots:   0 total
+Time:        1.58 s, estimated 4 s
+Ran all test suites matching compression-bomb.

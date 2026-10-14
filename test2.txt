@@ -1,0 +1,13 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand --coverage --forceExit --detectOpenHandles
+PASS src/__tests__/security/geofence-validation.test.ts
+C:\Users\Paolo Amor P. Palma\Downloads\FIinal-v5\Backend\node_modules\fast-check\lib\cjs\fast-check.js:51
+	if (!expectTruthy) throw new PreconditionFailure();
+	                         ^
+
+[PreconditionFailure [Error]] {
+  interruptExecution: false,
+  footprint: Symbol(fast-check/PreconditionFailure)
+}
+
+Node.js v24.18.0

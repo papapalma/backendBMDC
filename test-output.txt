@@ -1,0 +1,11 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand --testPathPattern=philippines-timezone --run
+testPathPattern:
+
+  Option "testPathPattern" was replaced by "--testPathPatterns". "--testPathPatterns" is only available as a command-line option.
+  
+  Please update your configuration.
+
+  CLI Options Documentation:
+  https://jestjs.io/docs/cli
+

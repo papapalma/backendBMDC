@@ -1,0 +1,36 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { requireRoleAsync } from '@/middleware/auth';
+import { successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { registrationService } from '@/services/registrationService';
+
+// OPTIONS /api/registrations/pending-count - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+/**
+ * GET /api/registrations/pending-count
+ * Get count of pending registrations for the current tenant
+ * Used to display badge on Registrations navigation item
+ */
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, [
+  'local_admin',
+  'staff_training_coordinator',
+  'staff_inventory_manager',
+  'super_admin',
+  ]);
+  if ('error' in authResult) return authResult.error;
+
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const context = ctxResult.context;
+  const count = await registrationService.countPendingByTenant(context.tenantId);
+
+  return successResponse({ count });
+});

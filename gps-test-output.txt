@@ -1,0 +1,61 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand gps-validation
+PASS src/__tests__/security/gps-validation.test.ts
+  GPS Data Validation
+    valid coordinates
+      ΓêÜ should accept valid NYC coordinates with accuracy (2 ms)
+      ΓêÜ should accept valid coordinates without accuracy (1 ms)
+      ΓêÜ should accept SF coordinates
+      ΓêÜ should accept North Pole
+      ΓêÜ should accept South Pole
+      ΓêÜ should accept International Date Line (1 ms)
+      ΓêÜ should accept equator with valid accuracy
+    invalid ranges
+      ΓêÜ should reject latitude > 90
+      ΓêÜ should reject latitude < -90
+      ΓêÜ should reject longitude > 180 (1 ms)
+      ΓêÜ should reject longitude < -180
+      ΓêÜ should reject latitude 500
+      ΓêÜ should reject longitude 999
+    (0,0) rejection (GPS spoofing)
+      ΓêÜ should reject (0, 0) coordinates
+      ΓêÜ should reject (0, 0) without accuracy
+      ΓêÜ should reject (0, 0) with zero accuracy
+    missing or undefined values
+      ΓêÜ should reject missing latitude (1 ms)
+      ΓêÜ should reject missing longitude
+      ΓêÜ should reject null latitude
+      ΓêÜ should reject null longitude
+    accuracy validation
+      ΓêÜ should accept accuracy of 0
+      ΓêÜ should accept accuracy of 10
+      ΓêÜ should accept accuracy of 100
+      ΓêÜ should reject negative accuracy (1 ms)
+      ΓêÜ should reject accuracy > 100
+      ΓêÜ should reject accuracy of 1000
+      ΓêÜ should accept accuracy of 99.99
+      ΓêÜ should accept accuracy of 100 (boundary)
+      ΓêÜ should accept coordinates without accuracy field
+      ΓêÜ should reject undefined accuracy with out-of-range value
+      ΓêÜ should reject NaN accuracy
+    type validation
+      ΓêÜ should reject non-number latitude
+      ΓêÜ should reject non-number longitude
+      ΓêÜ should reject NaN latitude
+      ΓêÜ should reject NaN longitude
+    edge cases
+      ΓêÜ should handle very small valid coordinates
+      ΓêÜ should handle coordinates at boundaries
+      ΓêÜ should handle coordinates at opposite boundaries
+      ΓêÜ should handle floating point precision
+      ΓêÜ should handle scientific notation (1 ms)
+    return value structure
+      ΓêÜ should return valid: true for good coords
+      ΓêÜ should return valid: false with reason for bad coords
+      ΓêÜ should have descriptive error messages
+
+Test Suites: 1 passed, 1 total
+Tests:       43 passed, 43 total
+Snapshots:   0 total
+Time:        0.422 s, estimated 1 s
+Ran all test suites matching gps-validation.

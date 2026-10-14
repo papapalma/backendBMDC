@@ -1,0 +1,40 @@
+﻿/** * POST /api/admin/file-migration * GET  /api/admin/file-migration/verify * * File Storage Migration Endpoint * * Implements Requirement 15.5: *  - Move all existing files from /uploads/ to /uploads/{default_tenant_id}/ *  - Update database file_path references to include tenant_id prefix *  - Verify all file references are accessible after migration * * Access: Super Admin only * * POST body (all optional): * { *  "tenantId": "uuid",  // target tenant (defaults to BMDC default tenant) *  "dryRun":  true  // preview without moving files (default: false) * } */import { NextRequest, NextResponse } from 'next/server';
+
+import { requireTenantContext } from '@/middleware/tenantContext';
+
+import { migrateFilesToDefaultTenant,  verifyFileMigration,  DEFAULT_TENANT_ID,} from '@/lib/fileMigration';
+
+import { forbiddenResponse, successResponse } from '@/utils/responses';
+
+import { withErrorHandler } from '@/middleware/errorHandler';
+
+import { handleOptionsRequest } from '@/middleware/cors';
+
+import { logger } from '@/utils/logger';
+
+export async function OPTIONS(request: NextRequest) { return handleOptionsRequest(request);}/** * POST /api/admin/file-migration * Run the file migration (or dry-run). */export const POST = withErrorHandler(async (request: NextRequest) => { const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { userId, isSuperAdmin } = ctxResult.context;
+  if (!isSuperAdmin) { return forbiddenResponse('Only Super Admins can run file migrations');
+}
+
+const body = await request.json().catch(() => ({}));
+  const { tenantId = DEFAULT_TENANT_ID, dryRun = false } = body as { tenantId?: string;  dryRun?: boolean;  };  logger.info('[FILE_MIGRATION_API] Migration triggered', { userId, tenantId, dryRun });
+
+  const result = await migrateFilesToDefaultTenant(tenantId, dryRun);
+  return successResponse(  result,  dryRun ? 'Dry-run complete — no files were moved' : 'File migration complete'  );});
+
+/** * GET /api/admin/file-migration * Verify that all DB file references are accessible on disk. */export const GET = withErrorHandler(async (request: NextRequest) => { const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { userId, isSuperAdmin } = ctxResult.context;
+  if (!isSuperAdmin) { return forbiddenResponse('Only Super Admins can verify file migration');
+}
+
+const { searchParams } = new URL(request.url);
+
+  const tenantId = searchParams.get('tenantId') ?? undefined;  logger.info('[FILE_MIGRATION_API] Verification triggered', { userId, tenantId });
+
+  const result = await verifyFileMigration(tenantId);
+  return successResponse(result, 'Verification complete');});

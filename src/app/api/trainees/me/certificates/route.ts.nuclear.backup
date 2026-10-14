@@ -1,0 +1,70 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { requireRoleAsync } from '@/middleware/auth';
+import { successResponse, notFoundResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/trainees/me/certificates - Handle CORS preflight
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+/**
+ * GET /api/trainees/me/certificates
+ * Get certificates for the current authenticated trainee.
+ * Fetches from the certificates table (linked through enrollments).
+ */
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const authResult = await requireRoleAsync(request, ['trainee']);
+  if ('error' in authResult) return authResult.error as NextResponse;
+
+  const userId = authResult.user.userId;
+
+  // Resolve the trainee profile for this user
+  const { data: traineeAccount, error: accountError } = await supabaseAdmin
+  .from('trainee_accounts')
+  .select('trainee_id, trainees ( id, first_name, last_name )')
+  .eq('user_id', userId)
+  .single();
+
+  if (accountError || !traineeAccount) {
+  return notFoundResponse('Trainee profile not found for this user');
+  }
+
+const trainee = traineeAccount.trainees as { id: string; first_name: string; last_name: string } | null;
+  if (!trainee) {
+  return notFoundResponse('Trainee profile not found');
+  }
+
+  // Fetch certificates via enrollments → certificates
+  const { data: certificates, error } = await supabaseAdmin
+  .from('certificates')
+  .select(`
+  id,
+  certificate_number,
+  issue_date,
+  file_path,
+  qr_code,
+  qr_code_path,
+  verification_url,
+  signatory_name,
+  signatory_title,
+  created_at,
+  enrollments!inner (
+  trainee_id,
+  program_id,
+  programs ( name )
+  )
+  `)
+  .eq('enrollments.trainee_id', trainee.id);
+
+  if (error) throw error;
+
+  return successResponse({
+  trainee_id: trainee.id,
+  trainee_name: `${trainee.first_name} ${trainee.last_name}`,
+  certificates: certificates || [],
+  });
+});

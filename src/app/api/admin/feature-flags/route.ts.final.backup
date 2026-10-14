@@ -1,0 +1,54 @@
+﻿/** * GET  /api/admin/feature-flags  — list feature flags for a tenant (Req 23.1, 23.2) * POST /api/admin/feature-flags  — create a feature flag for a tenant (Req 23.1, 23.2) * * Requirements: 23.1, 23.2 * * Access: *  - Super Admin: can manage flags for any tenant (pass ?tenant_id=) *  - Local Admin: can only manage flags for their own tenant */import { NextRequest, NextResponse } from 'next/server';
+
+import { requireTenantContext } from '@/middleware/tenantContext';
+
+import { successResponse, forbiddenResponse, errorResponse } from '@/utils/responses';
+
+import { withErrorHandler } from '@/middleware/errorHandler';
+
+import { handleOptionsRequest } from '@/middleware/cors';
+
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+import { invalidateFeatureFlagCache, FeatureKey } from '@/lib/featureFlags';
+
+import { z } from 'zod';
+
+const createFlagSchema = z.object({ feature_key: z.string()  .min(1, 'Feature key is required')  .max(100)  .regex(/^[a-z_]+$/, 'Feature key must be lowercase letters and underscores only'),  enabled: z.boolean().default(false),  configuration: z.record(z.unknown()).optional().nullable(),});
+
+export async function OPTIONS(request: NextRequest) { return handleOptionsRequest(request);}// GET /api/admin/feature-flags — list all feature flags for a tenant (Req 23.1)export const GET = withErrorHandler(async (request: NextRequest) => { const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, role, isSuperAdmin } = ctxResult.context;
+
+  const allowedRoles = ['local_admin'];
+  if (!allowedRoles.includes(role) && !isSuperAdmin) { return forbiddenResponse('Only administrators can manage feature flags');
+}  const { searchParams } = new URL(request.url);
+
+  const targetTenantId = isSuperAdmin  ? (searchParams.get('tenant_id') || tenantId)  : tenantId;
+  const { data, error } = await supabaseAdmin  .from('feature_flags')  .select('*')  .eq('tenant_id', targetTenantId)  .order('feature_key');
+  if (error) throw error;
+
+  // Enrich with known feature key descriptions  const descriptions: Record<string, string> = {  [FeatureKey.INVENTORY_MANAGEMENT]:  'Inventory tracking and management module',  [FeatureKey.CERTIFICATE_GENERATION]: 'PDF certificate generation for completed trainees',  [FeatureKey.QR_CODE_ATTENDANCE]:  'QR code-based attendance scanning',  [FeatureKey.MOBILE_APP_ACCESS]:  'Trainee mobile application access',  [FeatureKey.WHATSAPP_NOTIFICATIONS]: 'WhatsApp Business API notifications',  [FeatureKey.EMAIL_NOTIFICATIONS]:  'SMTP email notifications',  };
+  const enriched = (data ?? []).map((flag) => ({  ...flag,  description: descriptions[flag.feature_key] ?? null,  }));  return successResponse(enriched);});
+
+// POST /api/admin/feature-flags — create a feature flag (Req 23.1, 23.2)export const POST = withErrorHandler(async (request: NextRequest) => { const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, role, isSuperAdmin } = ctxResult.context;
+
+  const allowedRoles = ['local_admin'];
+  if (!allowedRoles.includes(role) && !isSuperAdmin) { return forbiddenResponse('Only administrators can create feature flags');
+}  const { searchParams } = new URL(request.url);
+
+  const targetTenantId = isSuperAdmin  ? (searchParams.get('tenant_id') || tenantId)  : tenantId;
+  const body = await request.json();
+
+  const validated = createFlagSchema.parse(body);
+
+  // Check for duplicate  const { data: existing } = await supabaseAdmin  .from('feature_flags')  .select('id')  .eq('tenant_id', targetTenantId)  .eq('feature_key', validated.feature_key)  .maybeSingle();
+  if (existing) { return errorResponse(  `Feature flag "${validated.feature_key}" already exists for this tenant. Use PATCH to update it.`,  409  );
+}  const { data, error } = await supabaseAdmin  .from('feature_flags')  .insert({ tenant_id:  targetTenantId,  feature_key:  validated.feature_key,  enabled:  validated.enabled,  configuration: validated.configuration ?? null,  })  .select()  .single();
+  if (error) throw error;
+
+  // Invalidate cache for this flag  invalidateFeatureFlagCache(targetTenantId, validated.feature_key);  return successResponse(data, 'Feature flag created successfully', 201);});

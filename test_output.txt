@@ -1,0 +1,945 @@
+npm notice run inventory-backend@1.0.0 test
+npm notice run jest --runInBand src/__tests__/security --no-coverage
+FAIL src/__tests__/security/audit-logging.test.ts
+  ΓùÅ Console
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:83:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:107:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:132:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:154:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:186:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:211:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:239:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:277:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:301:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:328:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:360:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:399:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:424:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:453:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:482:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:509:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:551:7)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:578:9)
+
+    console.error
+      Failed to create activity log: {
+        message: 'TypeError: fetch failed',
+        details: 'TypeError: fetch failed\n' +
+          '\n' +
+          'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+          'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+          '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+        hint: '',
+        code: ''
+      }
+
+      181 |     
+      182 |     if (error) {
+    > 183 |       console.error('Failed to create activity log:', error);
+          |               ^
+      184 |       throw error;
+      185 |     }
+      186 |     
+
+      at ActivityLogService.createLog (src/services/activityLogService.ts:183:15)
+      at ActivityLogService.logAction (src/services/activityLogService.ts:204:5)
+      at Object.<anonymous> (src/__tests__/security/audit-logging.test.ts:600:7)
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 1. Authentication Audit Logging ΓÇ║ 1.1 Should create audit log on successful login
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 1. Authentication Audit Logging ΓÇ║ 1.2 Should create audit log on failed login attempt
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 1. Authentication Audit Logging ΓÇ║ 1.3 Should include user context in audit log (userId, timestamp)
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 1. Authentication Audit Logging ΓÇ║ 1.4 Should NOT include sensitive data in audit logs (no passwords, tokens)
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 2. JWT Refresh & Role Validation Audit Logging ΓÇ║ 2.1 Should log successful JWT refresh with role verification
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 2. JWT Refresh & Role Validation Audit Logging ΓÇ║ 2.2 Should flag and log role mismatch attempts during token refresh
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 2. JWT Refresh & Role Validation Audit Logging ΓÇ║ 2.3 Should log role escalation attempts
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 3. File Upload Audit Logging ΓÇ║ 3.1 Should log file uploads with user, tenant, filename, and size
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 3. File Upload Audit Logging ΓÇ║ 3.2 Should log file upload failures with reason
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 3. File Upload Audit Logging ΓÇ║ 3.3 Should NOT log file content/binary data in audit logs
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 4. Cross-Tenant Access Attempt Logging ΓÇ║ 4.1 Should log cross-tenant access attempts as denied
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 4. Cross-Tenant Access Attempt Logging ΓÇ║ 4.2 Should include IP address and user agent in audit logs
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 5. Failed Validation & Authorization Logging ΓÇ║ 5.1 Should log failed authorization attempts
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 5. Failed Validation & Authorization Logging ΓÇ║ 5.2 Should log account lockout after too many failed attempts
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 6. Audit Log Format & Machine Readability ΓÇ║ 6.1 Should format audit logs with timestamp, userId, action, resource, status
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 6. Audit Log Format & Machine Readability ΓÇ║ 6.2 Should format audit logs as JSON for machine parsing
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 6. Audit Log Format & Machine Readability ΓÇ║ 6.3 Should track details field with action-specific information
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 7. Data Retention & Audit Log Volume ΓÇ║ 7.1 Should retrieve activity logs efficiently with pagination
+
+    TypeError: fetch failed
+
+
+  ΓùÅ Audit Logging - Sensitive Operations ΓÇ║ 7. Data Retention & Audit Log Volume ΓÇ║ 7.2 Should support filtering by action type
+
+    TypeError: fetch failed
+
+
+FAIL src/__tests__/security/geofence-validation.test.ts
+  ΓùÅ Geofence Validation (Task 22) ΓÇ║ validateGeofence() ΓÇ║ Edge Cases ΓÇ║ should handle large geofence radius (1000m)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      194 |           largeGeofence
+      195 |         );
+    > 196 |         expect(result.valid).toBe(true);
+          |                              ^
+      197 |       });
+      198 |
+      199 |       it('should handle zero accuracy (GPS with perfect accuracy)', () => {
+
+      at Object.<anonymous> (src/__tests__/security/geofence-validation.test.ts:196:30)
+
+FAIL src/__tests__/security/jsonb-size-limits.test.ts
+  ΓùÅ JSONB Size Limits - validateJsonbSize ΓÇ║ edge cases ΓÇ║ should accept undefined value
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      163 |     it('should accept undefined value', () => {
+      164 |       const result = validateJsonbSize('device_info', undefined);
+    > 165 |       expect(result.valid).toBe(true);
+          |                            ^
+      166 |     });
+      167 |
+      168 |     it('should accept empty array', () => {
+
+      at Object.<anonymous> (src/__tests__/security/jsonb-size-limits.test.ts:165:28)
+
+PASS src/__tests__/security/selfie-encryption.test.ts (30.217 s)
+PASS src/__tests__/security/utilities.test.ts
+PASS src/__tests__/security/compression-bomb.test.ts
+PASS src/__tests__/security/malware-scanner.test.ts
+PASS src/__tests__/security/path-traversal.test.ts
+PASS src/__tests__/security/device-validation.test.ts
+PASS src/__tests__/security/csrf-protection.test.ts
+PASS src/__tests__/security/gps-validation.test.ts
+PASS src/__tests__/security/privilege-escalation.test.ts
+PASS src/__tests__/security/webhook-signing.test.ts
+  ΓùÅ Console
+
+    console.warn
+      [2026-10-06T05:13:38.952Z] [WARN] [WEBHOOK] Signature mismatch { received: '0697d451...', expected: '0697d451...' }
+
+      13 |         break;
+      14 |       case 'warn':
+    > 15 |         console.warn(logMessage, meta || '');
+         |                 ^
+      16 |         break;
+      17 |       case 'debug':
+      18 |         if (process.env.NODE_ENV === 'development') {
+
+      at Logger.log (src/utils/logger.ts:15:17)
+      at Logger.warn (src/utils/logger.ts:32:10)
+      at verifyWebhookSignature (src/lib/security/webhook-signing.ts:156:12)
+      at Object.<anonymous> (src/__tests__/security/webhook-signing.test.ts:123:42)
+
+    console.warn
+      [2026-10-06T05:13:38.956Z] [WARN] [WEBHOOK] Signature mismatch { received: '5c1bb2e4...', expected: '058ec49b...' }
+
+      13 |         break;
+      14 |       case 'warn':
+    > 15 |         console.warn(logMessage, meta || '');
+         |                 ^
+      16 |         break;
+      17 |       case 'debug':
+      18 |         if (process.env.NODE_ENV === 'development') {
+
+      at Logger.log (src/utils/logger.ts:15:17)
+      at Logger.warn (src/utils/logger.ts:32:10)
+      at verifyWebhookSignature (src/lib/security/webhook-signing.ts:156:12)
+      at Object.<anonymous> (src/__tests__/security/webhook-signing.test.ts:137:42)
+
+    console.warn
+      [2026-10-06T05:13:38.957Z] [WARN] [WEBHOOK] Signature mismatch { received: 'aa6d9de4...', expected: '52375641...' }
+
+      13 |         break;
+      14 |       case 'warn':
+    > 15 |         console.warn(logMessage, meta || '');
+         |                 ^
+      16 |         break;
+      17 |       case 'debug':
+      18 |         if (process.env.NODE_ENV === 'development') {
+
+      at Logger.log (src/utils/logger.ts:15:17)
+      at Logger.warn (src/utils/logger.ts:32:10)
+      at verifyWebhookSignature (src/lib/security/webhook-signing.ts:156:12)
+      at Object.<anonymous> (src/__tests__/security/webhook-signing.test.ts:152:42)
+
+    console.warn
+      [2026-10-06T05:13:38.959Z] [WARN] [WEBHOOK] Signature mismatch { received: 'aaaaaaaa...', expected: 'd464a541...' }
+
+      13 |         break;
+      14 |       case 'warn':
+    > 15 |         console.warn(logMessage, meta || '');
+         |                 ^
+      16 |         break;
+      17 |       case 'debug':
+      18 |         if (process.env.NODE_ENV === 'development') {
+
+      at Logger.log (src/utils/logger.ts:15:17)
+      at Logger.warn (src/utils/logger.ts:32:10)
+      at verifyWebhookSignature (src/lib/security/webhook-signing.ts:156:12)
+      at Object.<anonymous> (src/__tests__/security/webhook-signing.test.ts:286:43)
+
+    console.warn
+      [2026-10-06T05:13:38.959Z] [WARN] [WEBHOOK] Signature mismatch { received: 'd464a541...', expected: 'd464a541...' }
+
+      13 |         break;
+      14 |       case 'warn':
+    > 15 |         console.warn(logMessage, meta || '');
+         |                 ^
+      16 |         break;
+      17 |       case 'debug':
+      18 |         if (process.env.NODE_ENV === 'development') {
+
+      at Logger.log (src/utils/logger.ts:15:17)
+      at Logger.warn (src/utils/logger.ts:32:10)
+      at verifyWebhookSignature (src/lib/security/webhook-signing.ts:156:12)
+      at Object.<anonymous> (src/__tests__/security/webhook-signing.test.ts:293:43)
+
+    console.warn
+      [2026-10-06T05:13:38.960Z] [WARN] [WEBHOOK] Signature mismatch { received: '05e695d4...', expected: '9a13d574...' }
+
+      13 |         break;
+      14 |       case 'warn':
+    > 15 |         console.warn(logMessage, meta || '');
+         |                 ^
+      16 |         break;
+      17 |       case 'debug':
+      18 |         if (process.env.NODE_ENV === 'development') {
+
+      at Logger.log (src/utils/logger.ts:15:17)
+      at Logger.warn (src/utils/logger.ts:32:10)
+      at verifyWebhookSignature (src/lib/security/webhook-signing.ts:156:12)
+      at Object.<anonymous> (src/__tests__/security/webhook-signing.test.ts:374:42)
+
+    console.warn
+      [2026-10-06T05:13:38.961Z] [WARN] [WEBHOOK] Signature mismatch { received: 'e100d4fe...', expected: 'bdfbe65a...' }
+
+      13 |         break;
+      14 |       case 'warn':
+    > 15 |         console.warn(logMessage, meta || '');
+         |                 ^
+      16 |         break;
+      17 |       case 'debug':
+      18 |         if (process.env.NODE_ENV === 'development') {
+
+      at Logger.log (src/utils/logger.ts:15:17)
+      at Logger.warn (src/utils/logger.ts:32:10)
+      at verifyWebhookSignature (src/lib/security/webhook-signing.ts:156:12)
+      at Object.<anonymous> (src/__tests__/security/webhook-signing.test.ts:395:42)
+
+PASS src/__tests__/security/philippines-timezone.test.ts
+PASS src/__tests__/security/rls-tenant-filtering.test.ts
+PASS src/__tests__/security/audit-logging-unit.test.ts
+
+Test Suites: 3 failed, 13 passed, 16 total
+Tests:       21 failed, 510 passed, 531 total
+Snapshots:   0 total
+Time:        36.044 s, estimated 37 s
+Ran all test suites matching src/__tests__/security.
+Jest did not exit one second after the test run has completed.
+
+'This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue.
+
+  ΓùÅ  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "[validateTenantAccess] Database error: {
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\n' +
+        '\n' +
+        'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+        'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+        '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+      hint: '',
+      code: ''
+    }".
+
+      316 |  * (Future: support multiple geofences per program with nearest-match logic)
+      317 |  *
+    > 318 |  * Task 22.2: Fetch geofence from database
+          |                     ^
+      319 |  *
+      320 |  * @param programId - UUID of the training program
+      321 |  * @param tenantId - UUID of the tenant (for isolation)
+
+      at console.error (node_modules/@jest/console/build/index.js:124:10)
+      at validateTenantAccess (src/lib/security/index.ts:318:21)
+
+
+  ΓùÅ  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "[validateTenantAccess] Database error: {
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\n' +
+        '\n' +
+        'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+        'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+        '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+      hint: '',
+      code: ''
+    }".
+
+      316 |  * (Future: support multiple geofences per program with nearest-match logic)
+      317 |  *
+    > 318 |  * Task 22.2: Fetch geofence from database
+          |                     ^
+      319 |  *
+      320 |  * @param programId - UUID of the training program
+      321 |  * @param tenantId - UUID of the tenant (for isolation)
+
+      at console.error (node_modules/@jest/console/build/index.js:124:10)
+      at validateTenantAccess (src/lib/security/index.ts:318:21)
+
+
+  ΓùÅ  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "[validateTenantAccess] Database error: {
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\n' +
+        '\n' +
+        'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+        'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+        '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+      hint: '',
+      code: ''
+    }".
+
+      316 |  * (Future: support multiple geofences per program with nearest-match logic)
+      317 |  *
+    > 318 |  * Task 22.2: Fetch geofence from database
+          |                     ^
+      319 |  *
+      320 |  * @param programId - UUID of the training program
+      321 |  * @param tenantId - UUID of the tenant (for isolation)
+
+      at console.error (node_modules/@jest/console/build/index.js:124:10)
+      at validateTenantAccess (src/lib/security/index.ts:318:21)
+
+
+  ΓùÅ  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "[validateTenantAccess] Database error: {
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\n' +
+        '\n' +
+        'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+        'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+        '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+      hint: '',
+      code: ''
+    }".
+
+      316 |  * (Future: support multiple geofences per program with nearest-match logic)
+      317 |  *
+    > 318 |  * Task 22.2: Fetch geofence from database
+          |                     ^
+      319 |  *
+      320 |  * @param programId - UUID of the training program
+      321 |  * @param tenantId - UUID of the tenant (for isolation)
+
+      at console.error (node_modules/@jest/console/build/index.js:124:10)
+      at validateTenantAccess (src/lib/security/index.ts:318:21)
+
+
+  ΓùÅ  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "[validateTenantAccess] Database error: {
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\n' +
+        '\n' +
+        'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+        'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+        '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+      hint: '',
+      code: ''
+    }".
+
+      316 |  * (Future: support multiple geofences per program with nearest-match logic)
+      317 |  *
+    > 318 |  * Task 22.2: Fetch geofence from database
+          |                     ^
+      319 |  *
+      320 |  * @param programId - UUID of the training program
+      321 |  * @param tenantId - UUID of the tenant (for isolation)
+
+      at console.error (node_modules/@jest/console/build/index.js:124:10)
+      at validateTenantAccess (src/lib/security/index.ts:318:21)
+
+
+  ΓùÅ  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "[validateTenantAccess] Database error: {
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\n' +
+        '\n' +
+        'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+        'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+        '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+      hint: '',
+      code: ''
+    }".
+
+      316 |  * (Future: support multiple geofences per program with nearest-match logic)
+      317 |  *
+    > 318 |  * Task 22.2: Fetch geofence from database
+          |                     ^
+      319 |  *
+      320 |  * @param programId - UUID of the training program
+      321 |  * @param tenantId - UUID of the tenant (for isolation)
+
+      at console.error (node_modules/@jest/console/build/index.js:124:10)
+      at validateTenantAccess (src/lib/security/index.ts:318:21)
+
+
+  ΓùÅ  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "[validateTenantAccess] Database error: {
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\n' +
+        '\n' +
+        'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+        'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+        '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+      hint: '',
+      code: ''
+    }".
+
+      316 |  * (Future: support multiple geofences per program with nearest-match logic)
+      317 |  *
+    > 318 |  * Task 22.2: Fetch geofence from database
+          |                     ^
+      319 |  *
+      320 |  * @param programId - UUID of the training program
+      321 |  * @param tenantId - UUID of the tenant (for isolation)
+
+      at console.error (node_modules/@jest/console/build/index.js:124:10)
+      at validateTenantAccess (src/lib/security/index.ts:318:21)
+
+
+  ΓùÅ  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "[validateTenantAccess] Database error: {
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\n' +
+        '\n' +
+        'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+        'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+        '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+      hint: '',
+      code: ''
+    }".
+
+      316 |  * (Future: support multiple geofences per program with nearest-match logic)
+      317 |  *
+    > 318 |  * Task 22.2: Fetch geofence from database
+          |                     ^
+      319 |  *
+      320 |  * @param programId - UUID of the training program
+      321 |  * @param tenantId - UUID of the tenant (for isolation)
+
+      at console.error (node_modules/@jest/console/build/index.js:124:10)
+      at validateTenantAccess (src/lib/security/index.ts:318:21)
+
+
+  ΓùÅ  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "[validateTenantAccess] Database error: {
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\n' +
+        '\n' +
+        'Caused by: Error: getaddrinfo ENOTFOUND test-project.supabase.co (ENOTFOUND)\n' +
+        'Error: getaddrinfo ENOTFOUND test-project.supabase.co\n' +
+        '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)',
+      hint: '',
+      code: ''
+    }".
+
+      316 |  * (Future: support multiple geofences per program with nearest-match logic)
+      317 |  *
+    > 318 |  * Task 22.2: Fetch geofence from database
+          |                     ^
+      319 |  *
+      320 |  * @param programId - UUID of the training program
+      321 |  * @param tenantId - UUID of the tenant (for isolation)
+
+      at console.error (node_modules/@jest/console/build/index.js:124:10)
+      at validateTenantAccess (src/lib/security/index.ts:318:21)
+      at src/__tests__/security/utilities.test.ts:433:21
+

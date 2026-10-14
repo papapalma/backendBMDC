@@ -1,0 +1,350 @@
+[
+  {
+    "Path": "src\\app\\api\\activity-logs\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\activity-logs\\stats\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\accounts\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\audit-logs\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\backup\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\data-breach\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\extension-requests\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\feature-flags\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\file-cleanup\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\file-migration\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\migrations\\enrollment-requirements\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\performance\\route.ts",
+    "Methods": "GET,DELETE"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\pilot\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\reports\\cross-tenant-comparison\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\reports\\platform-summary\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\admin\\tenants\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\archive\\route.ts",
+    "Methods": "GET,PATCH"
+  },
+  {
+    "Path": "src\\app\\api\\attendance\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\attendance\\me\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\attendance\\schedules\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\attendance\\submit\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\auth\\change-password\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\auth\\login\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\auth\\logout\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\auth\\me\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\auth\\password-reset-requests\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\auth\\refresh\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\auth\\register\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\auth\\select-tenant\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\borrowing-slips\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\borrowing-slips\\active\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\borrowing-slips\\overdue\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\borrowing-slips\\stats\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\certificates\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\certificates\\templates\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\enrollments\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\extension-requests\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\instructors\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\items\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\items\\export\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\items\\scan\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\items\\stats\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\lendings\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\lendings\\export\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\lendings\\overdue\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\lendings\\stats\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\non-attendance-dates\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\notifications\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\privacy\\notice\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\programs\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\programs\\stats\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\push-subscriptions\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\registrations\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\registrations\\me\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\registrations\\pending-count\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\activity\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\attendance\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\comprehensive\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\dashboard\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\inventory\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\inventory-summary\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\lendings\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\programs\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\schedule\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\trainee-demographics\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\trainees\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\training-summary\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\reports\\users\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\requirement-definitions\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\requirements\\analytics\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\sessions\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\tenants\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\theme-presets\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\trainees\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\trainees\\export\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\trainees\\me\\route.ts",
+    "Methods": "GET,PUT"
+  },
+  {
+    "Path": "src\\app\\api\\trainees\\me\\certificates\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\trainees\\me\\dashboard\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\trainees\\me\\enrollments\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\trainees\\me\\programs\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\trainees\\stats\\route.ts",
+    "Methods": "GET"
+  },
+  {
+    "Path": "src\\app\\api\\upload\\route.ts",
+    "Methods": "POST,DELETE"
+  },
+  {
+    "Path": "src\\app\\api\\upload\\tenant\\route.ts",
+    "Methods": "POST,DELETE"
+  },
+  {
+    "Path": "src\\app\\api\\users\\route.ts",
+    "Methods": "GET,POST"
+  },
+  {
+    "Path": "src\\app\\api\\verification\\check-status\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\verification\\send-code\\route.ts",
+    "Methods": "POST"
+  },
+  {
+    "Path": "src\\app\\api\\verification\\verify-code\\route.ts",
+    "Methods": "POST"
+  }
+]

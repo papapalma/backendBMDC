@@ -1,0 +1,2766 @@
+{
+  "high": [
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\non-attendance-dates\\[id]\\route.ts",
+      "methods": "PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\overdue\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\overdue\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\[id]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\push-subscriptions\\[id]\\route.ts",
+      "methods": "DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\verification\\send-code\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\by-number\\[slipNumber]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\comprehensive\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\lendings\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirement-definitions\\[id]\\submitted-trainees\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\tenants\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\tenants\\[id]\\export\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\theme-presets\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\trainees\\me\\certificates\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\restore\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\verification\\check-status\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\non-attendance-dates\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\active\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\verification\\verify-code\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\schedules\\[id]\\overrides\\[overrideId]\\route.ts",
+      "methods": "DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\tenants\\[id]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\accounts\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\password-reset-requests\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\reports\\platform-summary\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\reports\\cross-tenant-comparison\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\pilot\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\performance\\route.ts",
+      "methods": "GET,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\tenants\\[id]\\deactivate\\route.ts",
+      "methods": "PATCH",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\backup\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\file-migration\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\tenants\\[id]\\reactivate\\route.ts",
+      "methods": "PATCH",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\file-cleanup\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    }
+  ],
+  "allEndpoints": [
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\certificates\\verify\\[identifier]\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\me\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\logout\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\privacy\\notice\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\programs\\[id]\\trainees\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\dashboard\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\extension-requests\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\change-password\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\extension-requests\\[id]\\route.ts",
+      "methods": "PATCH",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\extension-requests\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\upload\\route.ts",
+      "methods": "POST,DELETE",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\attendance\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\activity\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\non-attendance-dates\\[id]\\route.ts",
+      "methods": "PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\overdue\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\overdue\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\[id]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\push-subscriptions\\[id]\\route.ts",
+      "methods": "DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\verification\\send-code\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\by-number\\[slipNumber]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\comprehensive\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\lendings\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirement-definitions\\[id]\\submitted-trainees\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\tenants\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\tenants\\[id]\\export\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\theme-presets\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\trainees\\me\\certificates\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\restore\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\verification\\check-status\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\non-attendance-dates\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\active\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\verification\\verify-code\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\schedules\\[id]\\overrides\\[overrideId]\\route.ts",
+      "methods": "DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\tenants\\[id]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\accounts\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\password-reset-requests\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\reports\\platform-summary\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\reports\\cross-tenant-comparison\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\pilot\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\performance\\route.ts",
+      "methods": "GET,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\tenants\\[id]\\deactivate\\route.ts",
+      "methods": "PATCH",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\backup\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\file-migration\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\tenants\\[id]\\reactivate\\route.ts",
+      "methods": "PATCH",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 3,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\file-cleanup\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\training-summary\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\trainees\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\trainee-demographics\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\remarks\\[id]\\route.ts",
+      "methods": "PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\migrations\\enrollment-requirements\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\inventory-summary\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\inventory\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\users\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\auth\\refresh\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\programs\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\[type]\\csv\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirement-definitions\\[id]\\submissions\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirement-definitions\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\activity-logs\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\upload\\tenant\\route.ts",
+      "methods": "POST,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\audit-logs\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\remarks\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\notification-preferences\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\certificates\\route.ts",
+      "methods": "GET,POST,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\anonymize\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\[type]\\pdf\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\me\\enrollments\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\export\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainee-status\\[id]\\route.ts",
+      "methods": "GET,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\tenants\\[id]\\configuration\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\sessions\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirements\\analytics\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\registrations\\pending-count\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirement-definitions\\[id]\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\me\\dashboard\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\registrations\\me\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\activity-logs\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\instructors\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\files\\[...path]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\tenants\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\instructors\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\certificates\\[id]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\export\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\scan\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\export\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\lendings\\[id]\\return\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\password-reset-requests\\[id]\\route.ts",
+      "methods": "PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\me\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\share-link\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\push-subscriptions\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\verify-access\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\auth\\select-tenant\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\enroll\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\validate-share\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\data-breach\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\enrollments\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\me\\programs\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\submit\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\certificates\\templates\\[id]\\route.ts",
+      "methods": "GET,POST,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\certificates\\templates\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\certificates\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\me\\route.ts",
+      "methods": "GET,PUT",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\users\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\users\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\personal-data\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\enrollments\\[id]\\route.ts",
+      "methods": "GET,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\registrations\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\schedules\\[id]\\overrides\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\registrations\\[id]\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\notifications\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\archive\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\archive\\[id]\\route.ts",
+      "methods": "DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\schedule\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\schedules\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\sessions\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\feature-flags\\[id]\\route.ts",
+      "methods": "GET,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\feature-flags\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\theme-presets\\[id]\\apply\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\schedules\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 1,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\register\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 0,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\auth\\login\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    }
+  ],
+  "low": [
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\data-breach\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\enrollments\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\me\\programs\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\submit\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\certificates\\templates\\[id]\\route.ts",
+      "methods": "GET,POST,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\certificates\\templates\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\certificates\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\me\\route.ts",
+      "methods": "GET,PUT",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\users\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\users\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\personal-data\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\enrollments\\[id]\\route.ts",
+      "methods": "GET,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\registrations\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\schedules\\[id]\\overrides\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\registrations\\[id]\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\notifications\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\archive\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\archive\\[id]\\route.ts",
+      "methods": "DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\schedule\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\schedules\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\sessions\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\feature-flags\\[id]\\route.ts",
+      "methods": "GET,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\feature-flags\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\theme-presets\\[id]\\apply\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 1,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\schedules\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 1,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\register\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    }
+  ],
+  "timestamp": "2026-10-05T10:50:59Z",
+  "totalEndpoints": 137,
+  "lowCount": 35,
+  "critical": [
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\certificates\\verify\\[identifier]\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\me\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\logout\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\privacy\\notice\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 5,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\programs\\[id]\\trainees\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\dashboard\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\extension-requests\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\change-password\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\extension-requests\\[id]\\route.ts",
+      "methods": "PATCH",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\extension-requests\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\upload\\route.ts",
+      "methods": "POST,DELETE",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\attendance\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 4,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\activity\\route.ts",
+      "methods": "GET",
+      "hasAuth": false,
+      "hasInputValidation": false,
+      "hasRole": false
+    }
+  ],
+  "mediumCount": 51,
+  "secureCount": 1,
+  "medium": [
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\training-summary\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\trainees\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\trainee-demographics\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\remarks\\[id]\\route.ts",
+      "methods": "PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\migrations\\enrollment-requirements\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\inventory-summary\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\inventory\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\users\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\auth\\refresh\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\programs\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\[type]\\csv\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirement-definitions\\[id]\\submissions\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirement-definitions\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\activity-logs\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\upload\\tenant\\route.ts",
+      "methods": "POST,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\audit-logs\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\remarks\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\notification-preferences\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\certificates\\route.ts",
+      "methods": "GET,POST,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\[id]\\anonymize\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\reports\\[type]\\pdf\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\me\\enrollments\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\export\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainee-status\\[id]\\route.ts",
+      "methods": "GET,DELETE,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\tenants\\[id]\\configuration\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\sessions\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirements\\analytics\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\registrations\\pending-count\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\requirement-definitions\\[id]\\route.ts",
+      "methods": "GET,PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\trainees\\me\\dashboard\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\registrations\\me\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\activity-logs\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\instructors\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\files\\[...path]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\admin\\tenants\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\instructors\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\certificates\\[id]\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\export\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\items\\scan\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\lendings\\export\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\borrowing-slips\\[id]\\route.ts",
+      "methods": "GET,PUT,DELETE",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\lendings\\[id]\\return\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": false,
+      "endpoint": "src\\app\\api\\auth\\password-reset-requests\\[id]\\route.ts",
+      "methods": "PATCH",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\attendance\\me\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\share-link\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\push-subscriptions\\route.ts",
+      "methods": "GET,POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\verify-access\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": true,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\auth\\select-tenant\\route.ts",
+      "methods": "POST",
+      "hasAuth": false,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\enroll\\route.ts",
+      "methods": "POST",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\validate-share\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": true,
+      "hasRole": false
+    },
+    {
+      "hasRateLimit": false,
+      "gapCount": 2,
+      "hasTenant": true,
+      "endpoint": "src\\app\\api\\programs\\[id]\\stats\\route.ts",
+      "methods": "GET",
+      "hasAuth": true,
+      "hasInputValidation": false,
+      "hasRole": true
+    }
+  ],
+  "securityMetrics": {
+    "withAuth": 112,
+    "withRole": 73,
+    "withValidation": 67,
+    "withTenant": 117,
+    "withRateLimit": 8
+  },
+  "highCount": 34,
+  "criticalCount": 16,
+  "secure": {
+    "hasRateLimit": true,
+    "gapCount": 0,
+    "hasTenant": true,
+    "endpoint": "src\\app\\api\\auth\\login\\route.ts",
+    "methods": "POST",
+    "hasAuth": true,
+    "hasInputValidation": true,
+    "hasRole": true
+  }
+}

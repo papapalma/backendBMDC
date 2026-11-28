@@ -1,0 +1,47 @@
+﻿import { NextRequest, NextResponse } from 'next/server';
+
+import { lendingService } from '@/services/lendingService';
+
+import { requireTenantContext } from '@/middleware/tenantContext';
+
+import { forbiddenResponse } from '@/utils/responses';
+
+import { createLendingSchema } from '@/utils/validators';
+
+import { successResponse } from '@/utils/responses';
+
+import { withErrorHandler } from '@/middleware/errorHandler';
+
+import { activityLogService } from '@/services/activityLogService';
+
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/lendings - Handle CORS preflightexport async function OPTIONS(request: NextRequest) { return handleOptionsRequest(request);}// GET /api/lendings - Get all lendings (tenant-scoped)export const GET = withErrorHandler(async (request: NextRequest) => { const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const context = ctxResult.context;
+  const { searchParams } = new URL(request.url);
+
+  const trainee_id = searchParams.get('trainee_id') || undefined;
+  const status = searchParams.get('status') || undefined;
+
+  const start_date = searchParams.get('start_date') || undefined;
+  const end_date = searchParams.get('end_date') || undefined;
+
+  // Pass full context to service (Task 3.3: Services need isSuperAdmin flag)  const lendings = await lendingService.getAllLendings(context, { trainee_id,  status,  start_date,  end_date,  });
+  return successResponse(lendings);});
+
+// POST /api/lendings - Create new lending (tenant-scoped)export const POST = withErrorHandler(async (request: NextRequest) => { const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId, role } = ctxResult.context;
+
+  const allowedRoles = ['local_admin', 'staff_inventory_manager'];
+  if (!allowedRoles.includes(role)) { return forbiddenResponse('Insufficient permissions to create lendings');
+}
+
+const body = await request.json();
+  const validatedData = createLendingSchema.parse(body);
+
+  const lending = await lendingService.createLending(validatedData, userId, tenantId);
+  await activityLogService.logAction(userId, 'create', 'lending', lending.id, {  ...validatedData,  tenantId,  }, undefined, tenantId);  return successResponse(lending, 'Lending created successfully', 201);});

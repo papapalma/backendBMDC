@@ -1,0 +1,23 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { lendingService } from '@/services/lendingService';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { successResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+
+// OPTIONS /api/lendings/overdue - Handle CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/lendings/overdue - Get all overdue lendings (tenant-scoped)
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const context = ctxResult.context;
+
+  // Pass full context to service (Task 3.3: Services need isSuperAdmin flag)
+  const overdueLendings = await lendingService.getOverdueLendings(context);
+  return successResponse(overdueLendings);
+});

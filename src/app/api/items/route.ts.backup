@@ -1,0 +1,80 @@
+/**
+ * GET  /api/items  — list items (tenant-scoped, Req 8.1, 8.2, 8.3)
+ * POST /api/items  — create item (tenant-scoped, Req 8.1, 8.5)
+ *
+ * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.8, 17.5, 17.6, 23.4
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { itemService } from '@/services/itemService';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { createItemSchema } from '@/utils/validators';
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { activityLogService } from '@/services/activityLogService';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { requireFeature, FeatureKey } from '@/lib/featureFlags';
+
+// OPTIONS /api/items - Handle CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+// GET /api/items - Get all items scoped to the requesting user's tenant (Req 8.2, 8.3)
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  // Tenant context required — items are tenant-scoped (Req 8.2, 8.3)
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const context = ctxResult.context;
+
+  // Feature gate: inventory_management must be enabled (Req 23.4)
+  if (!context.isSuperAdmin) {
+    const featureCheck = await requireFeature(context.tenantId, FeatureKey.INVENTORY_MANAGEMENT);
+    if (featureCheck) return featureCheck as any;
+  }
+
+  const { searchParams } = new URL(request.url);
+  const category = searchParams.get('category') || undefined;
+  const status = searchParams.get('status') || undefined;
+  const search = searchParams.get('search') || undefined;
+
+  // Pass full context to service (Task 3.3: Services need isSuperAdmin flag)
+  const items = await itemService.getAllItems(context, {
+    category,
+    status,
+    search,
+  });
+  return successResponse(items);
+});
+
+// POST /api/items - Create new item associated with the user's tenant (Req 8.1, 8.5)
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId, role, isSuperAdmin } = ctxResult.context;
+
+  // Only local_admin and staff_inventory_manager may create items (Req 8.1)
+  const allowedRoles = ['local_admin', 'staff_inventory_manager'];
+  if (!allowedRoles.includes(role)) {
+    return forbiddenResponse('Insufficient permissions to create items');
+  }
+
+  // Feature gate: inventory_management must be enabled (Req 23.4)
+  if (!isSuperAdmin) {
+    const featureCheck = await requireFeature(tenantId, FeatureKey.INVENTORY_MANAGEMENT);
+    if (featureCheck) return featureCheck as any;
+  }
+
+  const body = await request.json();
+  const validatedData = createItemSchema.parse(body);
+
+  // Inject tenant_id from JWT — callers cannot override this (Req 8.1)
+  const item = await itemService.createItem(validatedData, userId, tenantId);
+  await activityLogService.logAction(userId, 'create', 'item', item.id, {
+    name: validatedData.name,
+    tenantId,
+  }, undefined, tenantId);
+
+  return successResponse(item, 'Item created successfully', 201);
+});

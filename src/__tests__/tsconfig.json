@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "strict": false,
+    "incremental": false,
+    "types": ["jest", "node"],
+    "paths": {
+      "@/*": ["../*"],
+      "@/types/*": ["../types/*"],
+      "@/lib/*": ["../lib/*"],
+      "@/utils/*": ["../utils/*"]
+    }
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"],
+  "exclude": []
+}

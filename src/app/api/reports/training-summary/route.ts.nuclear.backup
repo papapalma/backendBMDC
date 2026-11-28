@@ -1,0 +1,97 @@
+﻿/**
+ * GET /api/reports/training-summary
+ *
+ * Tenant-scoped training summary report (Req 4.6, 7.9).
+ * Returns programs, enrollments, completions, and certificates for the
+ * requesting user's tenant. Supports date range filtering and PDF/CSV export.
+ *
+ * Requirements: 4.6, 7.9, 10.8, 10.9
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireTenantContext } from '@/middleware/tenantContext';
+import { successResponse, forbiddenResponse } from '@/utils/responses';
+import { withErrorHandler } from '@/middleware/errorHandler';
+import { handleOptionsRequest } from '@/middleware/cors';
+import { getTrainingSummary } from '@/services/reportingService';
+import {
+  buildSimplePdf,
+  createPdfDownloadResponse,
+  objectsToCsv,
+  createCsvDownloadResponse,
+} from '@/utils/export';
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptionsRequest(request);
+}
+
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const ctxResult = requireTenantContext(request);
+  if (ctxResult.error) return ctxResult.error as NextResponse;
+
+  const { tenantId, userId, role, isSuperAdmin } = ctxResult.context;
+
+  const allowedRoles = [
+  'local_admin',
+  'staff_training_coordinator',
+  'staff_inventory_manager',
+  ];
+  if (!allowedRoles.includes(role) && !isSuperAdmin) {
+  return forbiddenResponse('Insufficient permissions to view training reports');
+}
+
+  const { searchParams } = new URL(request.url);
+  const startDate =
+  searchParams.get('start_date') || searchParams.get('startDate') || undefined;
+  const endDate = searchParams.get('end_date') || searchParams.get('endDate') || undefined;
+  const format = searchParams.get('format') || 'json';
+
+  // Super Admin can query any tenant; others are locked to their own
+  const targetTenantId = isSuperAdmin
+  ? (searchParams.get('tenant_id') || tenantId)
+  : tenantId;
+
+  const report = await getTrainingSummary(targetTenantId, userId, { startDate, endDate });
+
+  // PDF export (Req 10.8)
+  if (format === 'pdf') {
+  const lines = [
+  `Generated: ${report.generatedAt}`,
+  `Tenant: ${report.tenantId}`,
+  '',
+  `Total Programs: ${report.totalPrograms}`,
+  `  Active: ${report.activePrograms}  Completed: ${report.completedPrograms}  Upcoming: ${report.upcomingPrograms}`,
+  '',
+  `Total Enrollments: ${report.totalEnrollments}`,
+  `  Active: ${report.activeEnrollments}  Completed: ${report.completedEnrollments}  Dropped: ${report.droppedEnrollments}`,
+  '',
+  `Total Certificates: ${report.totalCertificates}`,
+  `Enrollment Rate: ${report.enrollmentRate}%`,
+  `Completion Rate: ${report.completionRate}%`,
+  '',
+  '--- Program Breakdown ---',
+  ...report.programBreakdown.map(
+  (p) =>
+  `${p.name} | ${p.status} | Enrolled: ${p.enrollments} | Completed: ${p.completions} | Certs: ${p.certificates}`
+  ),
+  ];
+  const pdf = buildSimplePdf('Training Summary Report', lines);
+  return createPdfDownloadResponse(pdf, `training-summary-${targetTenantId}-${Date.now()}.pdf`);
+}
+
+  // CSV export (Req 10.8)
+  if (format === 'csv') {
+  const rows = report.programBreakdown.map((p) => ({
+  program_id: p.id,
+  program_name: p.name,
+  status: p.status,
+  enrollments: p.enrollments,
+  completions: p.completions,
+  certificates: p.certificates,
+  }));
+  const csv = objectsToCsv(rows);
+  return createCsvDownloadResponse(csv, `training-summary-${targetTenantId}-${Date.now()}.csv`);
+}
+
+  return successResponse(report);
+});
